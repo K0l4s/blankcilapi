@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,13 +45,16 @@ public class UserEntity implements UserDetails {
   private List<CommentEntity> comments;
 
   @OneToMany(mappedBy = "user_podcast")
-  private List<PocastEntity> podcasts;
+  private List<PodcastEntity> podcasts;
 
-  @ManyToMany(mappedBy = "user_like_list")
-  public HashSet<CommentEntity> comment_like_lists = new HashSet<>();
+  @OneToMany(mappedBy = "user_comment_like")
+  private List<CommentLikeEntity> comment_likes;
 
-  @ManyToMany(mappedBy = "user_like_list")
-  public HashSet<PocastEntity> podcast_like_lists = new HashSet<>();
+  @OneToMany(mappedBy = "user_podcast_like")
+  public List<PodcastLikeEntity> podcast_likes;
+
+  @OneToMany(mappedBy = "user_reply")
+  public List<ReplyEntity> user_replies;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
