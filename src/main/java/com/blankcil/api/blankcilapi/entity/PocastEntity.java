@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 public class PocastEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
     private String audio_url;
