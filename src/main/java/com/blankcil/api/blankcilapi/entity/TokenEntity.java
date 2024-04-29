@@ -1,6 +1,6 @@
-package com.blankcil.api.blankcilapi.token;
+package com.blankcil.api.blankcilapi.entity;
 
-import com.blankcil.api.blankcilapi.user.User;
+import com.blankcil.api.blankcilapi.token.TokenType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Token {
+public class TokenEntity {
 
   @Id
   @GeneratedValue
@@ -38,5 +38,5 @@ public class Token {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
-  public User user;
+  public UserEntity userEntity;
 }

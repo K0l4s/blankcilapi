@@ -1,13 +1,14 @@
-package com.blankcil.api.blankcilapi.auth;
+package com.blankcil.api.blankcilapi.service;
 
+import com.blankcil.api.blankcilapi.auth.AuthenticationRequest;
+import com.blankcil.api.blankcilapi.auth.AuthenticationResponse;
+import com.blankcil.api.blankcilapi.auth.RegisterRequest;
 import com.blankcil.api.blankcilapi.config.JwtService;
-import com.blankcil.api.blankcilapi.token.Token;
-import com.blankcil.api.blankcilapi.token.TokenRepository;
+import com.blankcil.api.blankcilapi.entity.UserEntity;
+import com.blankcil.api.blankcilapi.entity.TokenEntity;
+import com.blankcil.api.blankcilapi.repository.TokenRepository;
 import com.blankcil.api.blankcilapi.token.TokenType;
-import com.blankcil.api.blankcilapi.user.Role;
-import com.blankcil.api.blankcilapi.user.User;
-import com.blankcil.api.blankcilapi.user.UserRepository;
-import com.blankcil.api.blankcilapi.user.UserRepository;
+import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,13 +16,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +32,16 @@ public class AuthenticationService {
   private final AuthenticationManager authenticationManager;
 
   public AuthenticationResponse register(RegisterRequest request) {
-    var user = User.builder()
-        .firstname(request.getFirstname())
-        .lastname(request.getLastname())
-        .email(request.getEmail())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .role(request.getRole())
+    var user = UserEntity.builder()
+            .fullname(request.getFullname())
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .role(request.getRole())
+            .address(request.getAddress())
+            .phone(request.getPhone())
+            .birthday(request.getBirthday())
+            .createDay(LocalDateTime.now())
+            .code(null)
         .build();
     var savedUser = repository.save(user);
     var jwtToken = jwtService.generateToken(user);
@@ -69,9 +72,9 @@ public class AuthenticationService {
         .build();
   }
 
-  private void saveUserToken(User user, String jwtToken) {
-    var token = Token.builder()
-        .user(user)
+  private void saveUserToken(UserEntity userEntity, String jwtToken) {
+    var token = TokenEntity.builder()
+        .userEntity(userEntity)
         .token(jwtToken)
         .tokenType(TokenType.BEARER)
         .expired(false)
@@ -80,8 +83,8 @@ public class AuthenticationService {
     tokenRepository.save(token);
   }
 
-  private void revokeAllUserTokens(User user) {
-    var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+  private void revokeAllUserTokens(UserEntity userEntity) {
+    var validUserTokens = tokenRepository.findAllValidTokenByUser(userEntity.getId());
     if (validUserTokens.isEmpty())
       return;
     validUserTokens.forEach(token -> {

@@ -1,8 +1,7 @@
 package com.blankcil.api.blankcilapi.config;
 
 import com.blankcil.api.blankcilapi.auditing.ApplicationAuditAware;
-import com.blankcil.api.blankcilapi.user.UserRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import com.blankcil.api.blankcilapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

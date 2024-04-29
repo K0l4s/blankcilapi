@@ -1,6 +1,6 @@
 package com.blankcil.api.blankcilapi.config;
 
-import com.blankcil.api.blankcilapi.token.TokenRepository;
+import com.blankcil.api.blankcilapi.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

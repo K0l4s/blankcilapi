@@ -1,5 +1,7 @@
-package com.blankcil.api.blankcilapi.user;
+package com.blankcil.api.blankcilapi.controller;
 
+import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
+import com.blankcil.api.blankcilapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;

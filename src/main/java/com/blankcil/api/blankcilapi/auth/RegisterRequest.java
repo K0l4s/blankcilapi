@@ -6,15 +6,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
-
-  private String firstname;
-  private String lastname;
+  private String fullname;
   private String email;
   private String password;
   private Role role;
+  private LocalDate birthday;
+  private String address;
+  private String phone;
+  private String code;
 }

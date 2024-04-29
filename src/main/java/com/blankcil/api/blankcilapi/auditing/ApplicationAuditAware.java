@@ -1,6 +1,6 @@
 package com.blankcil.api.blankcilapi.auditing;
 
-import com.blankcil.api.blankcilapi.user.User;
+import com.blankcil.api.blankcilapi.entity.UserEntity;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +22,7 @@ public class ApplicationAuditAware implements AuditorAware<Integer> {
             return Optional.empty();
         }
 
-        User userPrincipal = (User) authentication.getPrincipal();
-        return Optional.ofNullable(userPrincipal.getId());
+        UserEntity userEntityPrincipal = (UserEntity) authentication.getPrincipal();
+        return Optional.ofNullable(userEntityPrincipal.getId());
     }
 }
