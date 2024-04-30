@@ -1,4 +1,4 @@
-package com.blankcil.api.blankcilapi.auth;
+package com.blankcil.api.blankcilapi.model;
 
 import com.blankcil.api.blankcilapi.user.Role;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Builder

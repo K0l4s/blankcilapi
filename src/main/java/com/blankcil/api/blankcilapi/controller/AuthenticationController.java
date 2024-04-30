@@ -1,9 +1,9 @@
 package com.blankcil.api.blankcilapi.controller;
 
-import com.blankcil.api.blankcilapi.auth.AuthenticationRequest;
-import com.blankcil.api.blankcilapi.auth.AuthenticationResponse;
+import com.blankcil.api.blankcilapi.model.AuthenticationRequest;
+import com.blankcil.api.blankcilapi.model.AuthenticationResponse;
 import com.blankcil.api.blankcilapi.service.AuthenticationService;
-import com.blankcil.api.blankcilapi.auth.RegisterRequest;
+import com.blankcil.api.blankcilapi.model.RegisterRequest;
 import com.blankcil.api.blankcilapi.user.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

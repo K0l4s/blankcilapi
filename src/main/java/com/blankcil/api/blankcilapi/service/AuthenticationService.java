@@ -1,8 +1,8 @@
 package com.blankcil.api.blankcilapi.service;
 
-import com.blankcil.api.blankcilapi.auth.AuthenticationRequest;
-import com.blankcil.api.blankcilapi.auth.AuthenticationResponse;
-import com.blankcil.api.blankcilapi.auth.RegisterRequest;
+import com.blankcil.api.blankcilapi.model.AuthenticationRequest;
+import com.blankcil.api.blankcilapi.model.AuthenticationResponse;
+import com.blankcil.api.blankcilapi.model.RegisterRequest;
 import com.blankcil.api.blankcilapi.config.JwtService;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
 import com.blankcil.api.blankcilapi.entity.TokenEntity;
