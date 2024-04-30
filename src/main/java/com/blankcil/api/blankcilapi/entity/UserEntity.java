@@ -53,9 +53,6 @@ public class UserEntity implements UserDetails {
   @OneToMany(mappedBy = "user_podcast_like")
   public List<PodcastLikeEntity> podcast_likes;
 
-  @OneToMany(mappedBy = "user_reply")
-  public List<ReplyEntity> user_replies;
-
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return role.getAuthorities();
