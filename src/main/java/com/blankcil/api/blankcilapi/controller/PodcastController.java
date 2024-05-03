@@ -39,7 +39,7 @@ public class PodcastController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ResponseModel> getAllPodcasts() {
         try {
             List<PodcastModel> podcasts = podcastService.getAllPodcasts();
