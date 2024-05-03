@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/podcast")
 public class PodcastController {
@@ -34,6 +36,18 @@ public class PodcastController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to create podcast", null));
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<ResponseModel> getAllPodcasts() {
+        try {
+            List<PodcastModel> podcasts = podcastService.getAllPodcasts();
+            return ResponseEntity.ok(new ResponseModel(true, "Get successfully", podcasts));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed", null));
         }
     }
 }
