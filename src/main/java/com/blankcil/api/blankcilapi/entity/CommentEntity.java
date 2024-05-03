@@ -1,34 +1,26 @@
 package com.blankcil.api.blankcilapi.entity;
 
 import jakarta.persistence.*;
-import jdk.jfr.Name;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Name("comment")
+@Table(name = "comment")
 @Builder
 public class CommentEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String content;
-
-    //Một comment sẽ có nhiều comment reply
-    @OneToMany(mappedBy = "commentEntity")
-    private List<CommentEntity> comments;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    public CommentEntity commentEntity;
-
     private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,11 +29,15 @@ public class CommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="podcast_id")
-    public PocastEntity podcast_comment;
+    public PodcastEntity podcast_comment;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "comment_likes",
-    inverseJoinColumns = @JoinColumn(name = "user_id"),
-    joinColumns = @JoinColumn(name = "comment_id"))
-    public HashSet<UserEntity> user_like_list = new HashSet<>();
+    @OneToMany(mappedBy = "comment_like", cascade = CascadeType.ALL)
+    private List<CommentLikeEntity> comment_likes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private CommentEntity parentComment;
+
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
+    private List<CommentEntity> replies = new ArrayList<>();
 }

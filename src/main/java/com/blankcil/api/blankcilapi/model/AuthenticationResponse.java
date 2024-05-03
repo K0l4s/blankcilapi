@@ -1,4 +1,4 @@
-package com.blankcil.api.blankcilapi.auth;
+package com.blankcil.api.blankcilapi.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

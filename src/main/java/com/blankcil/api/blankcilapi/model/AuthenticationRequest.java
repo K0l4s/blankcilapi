@@ -1,4 +1,4 @@
-package com.blankcil.api.blankcilapi.auth;
+package com.blankcil.api.blankcilapi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
