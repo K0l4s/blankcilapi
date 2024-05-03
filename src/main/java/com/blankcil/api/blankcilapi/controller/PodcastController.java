@@ -4,13 +4,12 @@ import com.blankcil.api.blankcilapi.model.PodcastModel;
 import com.blankcil.api.blankcilapi.model.ResponseModel;
 import com.blankcil.api.blankcilapi.service.IPodcastService;
 import com.blankcil.api.blankcilapi.service.PodcastServiceImpl;
+import com.blankcil.api.blankcilapi.utils.MultipartFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/podcast")
@@ -19,9 +18,18 @@ public class PodcastController {
     IPodcastService podcastService = new PodcastServiceImpl();
 
     @PostMapping("/upload")
-    public ResponseEntity<ResponseModel>createPodcast(@ModelAttribute PodcastModel podcastModel) {
+    public ResponseEntity<ResponseModel>createPodcast(@ModelAttribute PodcastModel podcastModel,
+                                                      @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                                                      @RequestParam("audioFile") MultipartFile audioFile) {
+        MultipartFile fileToUpload;
+        if (imageFile == null || imageFile.isEmpty()) {
+            fileToUpload = MultipartFileUtils.createDefaultImage();
+        }
+        else {
+            fileToUpload = imageFile;
+        }
         try {
-            PodcastModel createdPodcast = podcastService.createPodcast(podcastModel);
+            PodcastModel createdPodcast = podcastService.createPodcast(podcastModel, fileToUpload, audioFile);
             return ResponseEntity.ok(new ResponseModel(true, "Podcast created successfully", createdPodcast));
         } catch (Exception e) {
             e.printStackTrace();

@@ -3,6 +3,7 @@ package com.blankcil.api.blankcilapi.service;
 import com.blankcil.api.blankcilapi.entity.PodcastEntity;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
+import com.blankcil.api.blankcilapi.utils.FFmpegUtil;
 import org.modelmapper.ModelMapper;
 import com.blankcil.api.blankcilapi.model.PodcastModel;
 import com.blankcil.api.blankcilapi.repository.PodcastRepository;
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
@@ -24,8 +27,11 @@ public class PodcastServiceImpl implements IPodcastService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private IFirebaseService firebaseService;
+
     @Override
-    public PodcastModel createPodcast(PodcastModel podcastModel) {
+    public PodcastModel createPodcast(PodcastModel podcastModel, MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException {
         PodcastEntity podcastEntity = modelMapper.map(podcastModel, PodcastEntity.class);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -36,6 +42,11 @@ public class PodcastServiceImpl implements IPodcastService {
 
         podcastEntity.setUser_podcast(userEntity);
         podcastEntity.setCreateDay(LocalDateTime.now());
+
+        //Store video URL
+        byte[] videoBytes = FFmpegUtil.combineMultipartFiles(imageFile, audioFile);
+        String videoURL = firebaseService.uploadFileToFirebase(videoBytes);
+        podcastEntity.setAudio_url(videoURL);
 
         podcastRepository.save(podcastEntity);
         return modelMapper.map(podcastEntity, PodcastModel.class);
