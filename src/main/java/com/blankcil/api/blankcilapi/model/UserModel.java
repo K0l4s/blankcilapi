@@ -19,6 +19,4 @@ public class UserModel implements Serializable {
     private LocalDate birthday;
     private String address;
     private String phone;
-    private String code;
-    private LocalDateTime createDay;
 }
