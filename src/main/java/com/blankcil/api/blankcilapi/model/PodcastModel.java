@@ -21,8 +21,9 @@ public class PodcastModel implements Serializable {
     private String content;
     private LocalDateTime createDay;
     private UserModel user_podcast;
-    @JsonManagedReference
-    private List<CommentModel> comments;
-    @JsonManagedReference
-    private List<PodcastLikeModel> podcast_likes;
+//    private List<CommentModel> comments;
+    private int numberOfComments;
+    private int numberOfLikes;
+//    @JsonManagedReference
+//    private List<PodcastLikeModel> podcast_likes;
 }

@@ -1,7 +1,11 @@
 package com.blankcil.api.blankcilapi.service;
 
+import com.blankcil.api.blankcilapi.entity.CommentEntity;
 import com.blankcil.api.blankcilapi.entity.PodcastEntity;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
+import com.blankcil.api.blankcilapi.model.CommentModel;
+import com.blankcil.api.blankcilapi.model.ParentCommentModel;
+import com.blankcil.api.blankcilapi.model.UserModel;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.blankcil.api.blankcilapi.utils.FFmpegUtil;
 import org.modelmapper.ModelMapper;
@@ -15,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,7 +64,12 @@ public class PodcastServiceImpl implements IPodcastService {
     public List<PodcastModel> getAllPodcasts() {
         List<PodcastEntity> podcastEntities = podcastRepository.findAll();
         return podcastEntities.stream()
-                .map(podcastEntity -> modelMapper.map(podcastEntity, PodcastModel.class))
+                .map(podcastEntity -> {
+                    PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
+                    podcastModel.setNumberOfComments(podcastEntity.getComments().size());
+                    podcastModel.setNumberOfLikes(podcastEntity.getPodcast_likes().size());
+                    return podcastModel;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -67,8 +77,32 @@ public class PodcastServiceImpl implements IPodcastService {
     public PodcastModel getPodcast(int id) {
         Optional<PodcastEntity> podcastEntity = podcastRepository.findById(id);
         if (podcastEntity.isPresent()) {
-            return modelMapper.map(podcastEntity, PodcastModel.class);
+            return modelMapper.map(podcastEntity.get(), PodcastModel.class);
         }
         return null;
+    }
+
+    @Override
+    public List<CommentModel> getCommentsForPodcast(int podcastId) {
+        PodcastEntity podcastEntity = podcastRepository.findById(podcastId)
+                .orElseThrow(() -> new RuntimeException("Podcast not found with id: " + podcastId));
+
+        return podcastEntity.getComments().stream()
+                .map(commentEntity -> {
+                    CommentModel commentModel = modelMapper.map(commentEntity, CommentModel.class);
+                    int numberOfLikes = commentEntity.getComment_likes().size(); // Số lượng likes của comment
+                    commentModel.setNumberOfLikes(numberOfLikes);
+
+                    // Ánh xạ dữ liệu user_comment cho parentComment nếu có
+                    if (commentEntity.getParentComment() != null) {
+                        ParentCommentModel parentCommentModel = modelMapper.map(commentEntity.getParentComment(), ParentCommentModel.class);
+                        // Thiết lập user_comment cho parentCommentModel từ CommentEntity tương ứng
+                        parentCommentModel.setUser_comment(modelMapper.map(commentEntity.getParentComment().getUser_comment(), UserModel.class));
+                        commentModel.setParentComment(parentCommentModel);
+                    }
+
+                    return commentModel;
+                })
+                .collect(Collectors.toList());
     }
 }
