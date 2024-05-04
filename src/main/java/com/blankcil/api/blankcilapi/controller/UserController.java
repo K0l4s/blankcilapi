@@ -26,6 +26,7 @@ public class UserController {
         service.changePassword(request, connectedUser);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/profile")
     public ResponseEntity<ResponseModel> getProfile() {
         try {
@@ -35,6 +36,19 @@ public class UserController {
         catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to get profile", null));
+        }
+    }
+
+    @PutMapping("/profile/edit")
+    public ResponseEntity<ResponseModel> updateProfile(
+            @RequestBody UserModel userModel
+    ) {
+        try {
+            UserModel updatedUser = service.updateUser(userModel);
+            return ResponseEntity.ok().body(new ResponseModel(true, "Profile updated successfully", updatedUser));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to update profile", null));
         }
     }
 }

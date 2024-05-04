@@ -50,4 +50,30 @@ public class UserService {
 
         return modelMapper.map(userEntity, UserModel.class);
     }
+    public UserModel updateUser(UserModel userModel) {
+        Principal connectedUser = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = connectedUser.getName();
+
+        UserEntity userEntity = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+
+        // Cập nhật thông tin người dùng nếu có sự thay đổi
+        if (userModel.getFullname() != null) {
+            userEntity.setFullname(userModel.getFullname());
+        }
+        if (userModel.getBirthday() != null) {
+            userEntity.setBirthday(userModel.getBirthday());
+        }
+        if (userModel.getAddress() != null) {
+            userEntity.setAddress(userModel.getAddress());
+        }
+        if (userModel.getPhone() != null) {
+            userEntity.setPhone(userModel.getPhone());
+        }
+
+        userRepository.save(userEntity);
+
+        // Trả về thông tin người dùng sau khi cập nhật
+        return modelMapper.map(userEntity, UserModel.class);
+    }
 }
