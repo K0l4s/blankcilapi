@@ -1,5 +1,6 @@
 package com.blankcil.api.blankcilapi.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,8 @@ public class PodcastModel implements Serializable {
     private String content;
     private LocalDateTime createDay;
     private UserModel user_podcast;
+    @JsonManagedReference
     private List<CommentModel> comments;
+    @JsonManagedReference
     private List<PodcastLikeModel> podcast_likes;
 }
