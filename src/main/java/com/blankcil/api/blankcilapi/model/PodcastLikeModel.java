@@ -1,5 +1,6 @@
 package com.blankcil.api.blankcilapi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 public class PodcastLikeModel implements Serializable {
     private Long id;
     private LocalDateTime timestamp;
+    @JsonBackReference
     private PodcastModel podcast_like;
     private UserModel user_podcast_like;
 }

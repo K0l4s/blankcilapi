@@ -15,6 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PodcastServiceImpl implements IPodcastService {
@@ -50,5 +53,22 @@ public class PodcastServiceImpl implements IPodcastService {
 
         podcastRepository.save(podcastEntity);
         return modelMapper.map(podcastEntity, PodcastModel.class);
+    }
+
+    @Override
+    public List<PodcastModel> getAllPodcasts() {
+        List<PodcastEntity> podcastEntities = podcastRepository.findAll();
+        return podcastEntities.stream()
+                .map(podcastEntity -> modelMapper.map(podcastEntity, PodcastModel.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PodcastModel getPodcast(int id) {
+        Optional<PodcastEntity> podcastEntity = podcastRepository.findById(id);
+        if (podcastEntity.isPresent()) {
+            return modelMapper.map(podcastEntity, PodcastModel.class);
+        }
+        return null;
     }
 }
