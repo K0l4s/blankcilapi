@@ -2,11 +2,13 @@ package com.blankcil.api.blankcilapi.repository;
 
 import com.blankcil.api.blankcilapi.entity.CommentEntity;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Repository
@@ -16,8 +18,12 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     @Query("UPDATE CommentEntity c SET c.totalLikes = (SELECT COUNT(cl) FROM CommentLikeEntity cl WHERE cl.comment_like.id = c.id)")
     void updateTotalLikesForComments();
 
-    // Phương thức truy vấn JPQL để đếm số lượt thích cho mỗi bình luận và trả về danh sách các CommentEntity đã được cập nhật với totalLikes
-    @Query("SELECT c, (SELECT COUNT(cl) FROM CommentLikeEntity cl WHERE cl.comment_like.id = c.id) AS totalLikes FROM CommentEntity c WHERE c.podcast_comment.id = :podcastId")
-    List<Object[]> getCommentsWithTotalLikesForPodcast(Long podcastId);
+    @Query("SELECT c, COUNT(cl) AS totalLikes " +
+            "FROM CommentEntity c " +
+            "LEFT JOIN c.comment_likes cl " +
+            "WHERE c.podcast_comment.id = :podcastId " +
+            "GROUP BY c " +
+            "ORDER BY c.timestamp DESC")
+    Page<Object[]> getCommentsWithTotalLikesForPodcast(Long podcastId, Pageable pageable);
 }
 

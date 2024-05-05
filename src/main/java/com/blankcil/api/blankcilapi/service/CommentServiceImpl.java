@@ -8,6 +8,8 @@ import com.blankcil.api.blankcilapi.repository.CommentRepository;
 import com.blankcil.api.blankcilapi.repository.PodcastRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,15 +24,14 @@ public class CommentServiceImpl implements ICommentService {
     private CommentRepository commentRepository;
 
     @Override
-    public List<CommentModel> getCommentsForPodcast(int podcastId) {
+    public Page<CommentModel> getCommentsForPodcast(int podcastId, Pageable pageable) {
         // Cập nhật totalLikes cho tất cả các bình luận trước khi truy vấn danh sách bình luận
         commentRepository.updateTotalLikesForComments();
 
-        List<Object[]> commentObjects = commentRepository.getCommentsWithTotalLikesForPodcast((long) podcastId);
+        Page<Object[]> commentPage = commentRepository.getCommentsWithTotalLikesForPodcast((long) podcastId, pageable);
 
         // Chuyển đổi danh sách các đối tượng Object[] thành danh sách các CommentModel
-        List<CommentModel> comments = commentObjects.stream()
-                .map(object -> {
+        Page<CommentModel> commentModelPage = commentPage.map(object -> {
                     CommentEntity commentEntity = (CommentEntity) object[0];
                     Long totalLikes = (Long) object[1];
 
@@ -59,11 +60,8 @@ public class CommentServiceImpl implements ICommentService {
                         parentCommentModel.setUser_comment(modelMapper.map(commentEntity.getParentComment().getUser_comment(), UserModel.class));
                         commentModel.setParentComment(parentCommentModel);
                     }
-
                     return commentModel;
-                })
-                .collect(Collectors.toList());
-
-        return comments;
+        });
+        return commentModelPage;
     }
 }

@@ -78,8 +78,50 @@ public class PodcastServiceImpl implements IPodcastService {
     public PodcastModel getPodcast(int id) {
         Optional<PodcastEntity> podcastEntity = podcastRepository.findById(id);
         if (podcastEntity.isPresent()) {
-            return modelMapper.map(podcastEntity.get(), PodcastModel.class);
+            PodcastModel podcastModel = modelMapper.map(podcastEntity.get(), PodcastModel.class);
+            podcastModel.setNumberOfLikes(podcastEntity.get().getPodcast_likes().size());
+            podcastModel.setNumberOfComments(podcastEntity.get().getComments().size());
+            return podcastModel;
         }
         return null;
     }
+
+    @Override
+    public List<PodcastModel> getPodcastsByPage(int pageNumber, int pageSize) {
+        // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
+        int offset = pageNumber * pageSize;
+
+        // Lấy danh sách podcast từ repository
+        List<PodcastEntity> podcastEntities = podcastRepository.findPaginated(offset, pageSize);
+
+        // Ánh xạ và trả về danh sách podcast model
+        return podcastEntities.stream()
+                .map(podcastEntity -> {
+                    PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
+                    podcastModel.setNumberOfComments(podcastEntity.getComments().size());
+                    podcastModel.setNumberOfLikes(podcastEntity.getPodcast_likes().size());
+                    return podcastModel;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PodcastModel> getPodcastTrending(int pageNumber, int pageSize) {
+        // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
+        int offset = pageNumber * pageSize;
+
+        // Lấy danh sách podcast từ repository
+        List<PodcastEntity> podcastEntities = podcastRepository.findPaginatedOrderByLikesDesc(offset, pageSize);
+
+        // Ánh xạ và trả về danh sách podcast model
+        return podcastEntities.stream()
+                .map(podcastEntity -> {
+                    PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
+                    podcastModel.setNumberOfComments(podcastEntity.getComments().size());
+                    podcastModel.setNumberOfLikes(podcastEntity.getPodcast_likes().size());
+                    return podcastModel;
+                })
+                .collect(Collectors.toList());
+    }
+
 }
