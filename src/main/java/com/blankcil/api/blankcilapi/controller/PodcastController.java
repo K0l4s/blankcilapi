@@ -3,6 +3,8 @@ package com.blankcil.api.blankcilapi.controller;
 import com.blankcil.api.blankcilapi.model.CommentModel;
 import com.blankcil.api.blankcilapi.model.PodcastModel;
 import com.blankcil.api.blankcilapi.model.ResponseModel;
+import com.blankcil.api.blankcilapi.service.CommentServiceImpl;
+import com.blankcil.api.blankcilapi.service.ICommentService;
 import com.blankcil.api.blankcilapi.service.IPodcastService;
 import com.blankcil.api.blankcilapi.service.PodcastServiceImpl;
 import com.blankcil.api.blankcilapi.utils.MultipartFileUtils;
@@ -19,6 +21,9 @@ import java.util.List;
 public class PodcastController {
     @Autowired
     IPodcastService podcastService = new PodcastServiceImpl();
+
+    @Autowired
+    ICommentService commentService = new CommentServiceImpl();
 
     @PostMapping("/upload")
     public ResponseEntity<ResponseModel>createPodcast(@ModelAttribute PodcastModel podcastModel,
@@ -67,7 +72,7 @@ public class PodcastController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<ResponseModel> getCommentsForPodcast(@PathVariable int id) {
         try {
-            List<CommentModel> comments = podcastService.getCommentsForPodcast(id);
+            List<CommentModel> comments = commentService.getCommentsForPodcast(id);
             return ResponseEntity.ok(new ResponseModel(true, "Get comments successfully", comments));
         } catch (Exception e) {
             e.printStackTrace();

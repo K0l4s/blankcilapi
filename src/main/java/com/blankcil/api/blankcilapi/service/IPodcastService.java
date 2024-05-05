@@ -11,5 +11,4 @@ public interface IPodcastService {
     PodcastModel createPodcast(PodcastModel podcastModel, MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException;
     List<PodcastModel> getAllPodcasts();
     PodcastModel getPodcast(int id);
-    List<CommentModel> getCommentsForPodcast(int podcastId);
 }

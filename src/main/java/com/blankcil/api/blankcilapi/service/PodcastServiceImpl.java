@@ -39,9 +39,6 @@ public class PodcastServiceImpl implements IPodcastService {
     @Autowired
     private IFirebaseService firebaseService;
 
-    @Autowired
-    private CommentRepository commentRepository;
-
     @Override
     public PodcastModel createPodcast(PodcastModel podcastModel, MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException {
         PodcastEntity podcastEntity = modelMapper.map(podcastModel, PodcastEntity.class);
@@ -84,51 +81,5 @@ public class PodcastServiceImpl implements IPodcastService {
             return modelMapper.map(podcastEntity.get(), PodcastModel.class);
         }
         return null;
-    }
-
-    @Override
-    public List<CommentModel> getCommentsForPodcast(int podcastId) {
-        // Cập nhật totalLikes cho tất cả các bình luận trước khi truy vấn danh sách bình luận
-        commentRepository.updateTotalLikesForComments();
-
-        List<Object[]> commentObjects = commentRepository.getCommentsWithTotalLikesForPodcast((long) podcastId);
-
-        // Chuyển đổi danh sách các đối tượng Object[] thành danh sách các CommentModel
-        List<CommentModel> comments = commentObjects.stream()
-                .map(object -> {
-                    CommentEntity commentEntity = (CommentEntity) object[0];
-                    Long totalLikes = (Long) object[1];
-
-                    // Cập nhật totalLikes cho mỗi CommentEntity
-                    commentEntity.setTotalLikes(totalLikes);
-
-                    // Cập nhật totalLikes cho các bình luận trong replies
-                    List<CommentEntity> replies = commentEntity.getReplies();
-                    for (CommentEntity reply : replies) {
-                        long replyTotalLikes = reply.getComment_likes().size();
-                        reply.setTotalLikes(replyTotalLikes);
-
-                        // Ánh xạ thông tin user_comment cho parentComment của reply
-                        if (reply.getParentComment() != null) {
-                            ParentCommentModel parentCommentModel = modelMapper.map(reply.getParentComment(), ParentCommentModel.class);
-                            parentCommentModel.setUser_comment(modelMapper.map(reply.getParentComment().getUser_comment(), UserModel.class));
-                        }
-                    }
-
-                    // Tiếp tục ánh xạ các thông tin còn lại từ CommentEntity sang CommentModel
-                    CommentModel commentModel = modelMapper.map(commentEntity, CommentModel.class);
-
-                    // Tiếp tục ánh xạ dữ liệu user_comment cho parentComment nếu có
-                    if (commentEntity.getParentComment() != null) {
-                        ParentCommentModel parentCommentModel = modelMapper.map(commentEntity.getParentComment(), ParentCommentModel.class);
-                        parentCommentModel.setUser_comment(modelMapper.map(commentEntity.getParentComment().getUser_comment(), UserModel.class));
-                        commentModel.setParentComment(parentCommentModel);
-                    }
-
-                    return commentModel;
-                })
-                .collect(Collectors.toList());
-
-        return comments;
     }
 }
