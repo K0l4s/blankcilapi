@@ -26,9 +26,9 @@ public class PodcastEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    public UserEntity user_podcast;
+    private UserEntity user_podcast;
 
-    @OneToMany(mappedBy = "podcast_comment")
+    @OneToMany(mappedBy = "podcast_comment", cascade = CascadeType.ALL)
     private List<CommentEntity> comments;
 
     @OneToMany(mappedBy = "podcast_like", cascade = CascadeType.ALL)

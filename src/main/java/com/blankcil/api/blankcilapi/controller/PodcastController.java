@@ -1,11 +1,17 @@
 package com.blankcil.api.blankcilapi.controller;
 
+import com.blankcil.api.blankcilapi.model.CommentModel;
 import com.blankcil.api.blankcilapi.model.PodcastModel;
 import com.blankcil.api.blankcilapi.model.ResponseModel;
+import com.blankcil.api.blankcilapi.service.CommentServiceImpl;
+import com.blankcil.api.blankcilapi.service.ICommentService;
 import com.blankcil.api.blankcilapi.service.IPodcastService;
 import com.blankcil.api.blankcilapi.service.PodcastServiceImpl;
 import com.blankcil.api.blankcilapi.utils.MultipartFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +24,9 @@ import java.util.List;
 public class PodcastController {
     @Autowired
     IPodcastService podcastService = new PodcastServiceImpl();
+
+    @Autowired
+    ICommentService commentService = new CommentServiceImpl();
 
     @PostMapping("/upload")
     public ResponseEntity<ResponseModel>createPodcast(@ModelAttribute PodcastModel podcastModel,
@@ -39,15 +48,48 @@ public class PodcastController {
         }
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<ResponseModel> getAllPodcasts() {
+    @GetMapping("/view/{id}")
+    public ResponseEntity<ResponseModel> getPodcast(@PathVariable int id) {
         try {
-            List<PodcastModel> podcasts = podcastService.getAllPodcasts();
+            PodcastModel podcasts = podcastService.getPodcast(id);
             return ResponseEntity.ok(new ResponseModel(true, "Get successfully", podcasts));
         }
         catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed", null));
+        }
+    }
+
+    @GetMapping("/view/page")
+    public ResponseEntity<ResponseModel> getPodcastsByPage(
+            @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(value = "trending", defaultValue = "false") boolean trending)
+    {
+        try {
+            List<PodcastModel> podcasts;
+            if (trending) {
+                podcasts = podcastService.getPodcastTrending(pageNumber, pageSize);
+            } else {
+                podcasts = podcastService.getPodcastsByPage(pageNumber, pageSize);
+            }
+            return ResponseEntity.ok(new ResponseModel(true, "Get successfully", podcasts));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed", null));
+        }
+    }
+
+    @GetMapping("/view/{id}/comments")
+    public ResponseEntity<ResponseModel> getCommentsForPodcast(@PathVariable int id,
+                                                               @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        try {
+            Page<CommentModel> commentPage = commentService.getCommentsForPodcast(id, pageable);
+            return ResponseEntity.ok(new ResponseModel(true, "Get comments successfully", commentPage.getContent()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseModel(false, "Failed to get comments", null));
         }
     }
 }

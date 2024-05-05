@@ -3,6 +3,7 @@ package com.blankcil.api.blankcilapi.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "comment")
@@ -25,14 +27,16 @@ public class CommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    public UserEntity user_comment;
+    private UserEntity user_comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="podcast_id")
-    public PodcastEntity podcast_comment;
+    private PodcastEntity podcast_comment;
 
     @OneToMany(mappedBy = "comment_like", cascade = CascadeType.ALL)
     private List<CommentLikeEntity> comment_likes;
+
+    private long totalLikes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")

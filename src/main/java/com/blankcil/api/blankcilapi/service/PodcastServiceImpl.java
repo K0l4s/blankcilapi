@@ -1,7 +1,12 @@
 package com.blankcil.api.blankcilapi.service;
 
+import com.blankcil.api.blankcilapi.entity.CommentEntity;
 import com.blankcil.api.blankcilapi.entity.PodcastEntity;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
+import com.blankcil.api.blankcilapi.model.CommentModel;
+import com.blankcil.api.blankcilapi.model.ParentCommentModel;
+import com.blankcil.api.blankcilapi.model.UserModel;
+import com.blankcil.api.blankcilapi.repository.CommentRepository;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.blankcil.api.blankcilapi.utils.FFmpegUtil;
 import org.modelmapper.ModelMapper;
@@ -15,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,7 +65,12 @@ public class PodcastServiceImpl implements IPodcastService {
     public List<PodcastModel> getAllPodcasts() {
         List<PodcastEntity> podcastEntities = podcastRepository.findAll();
         return podcastEntities.stream()
-                .map(podcastEntity -> modelMapper.map(podcastEntity, PodcastModel.class))
+                .map(podcastEntity -> {
+                    PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
+                    podcastModel.setNumberOfComments(podcastEntity.getComments().size());
+                    podcastModel.setNumberOfLikes(podcastEntity.getPodcast_likes().size());
+                    return podcastModel;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -67,8 +78,50 @@ public class PodcastServiceImpl implements IPodcastService {
     public PodcastModel getPodcast(int id) {
         Optional<PodcastEntity> podcastEntity = podcastRepository.findById(id);
         if (podcastEntity.isPresent()) {
-            return modelMapper.map(podcastEntity, PodcastModel.class);
+            PodcastModel podcastModel = modelMapper.map(podcastEntity.get(), PodcastModel.class);
+            podcastModel.setNumberOfLikes(podcastEntity.get().getPodcast_likes().size());
+            podcastModel.setNumberOfComments(podcastEntity.get().getComments().size());
+            return podcastModel;
         }
         return null;
     }
+
+    @Override
+    public List<PodcastModel> getPodcastsByPage(int pageNumber, int pageSize) {
+        // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
+        int offset = pageNumber * pageSize;
+
+        // Lấy danh sách podcast từ repository
+        List<PodcastEntity> podcastEntities = podcastRepository.findPaginated(offset, pageSize);
+
+        // Ánh xạ và trả về danh sách podcast model
+        return podcastEntities.stream()
+                .map(podcastEntity -> {
+                    PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
+                    podcastModel.setNumberOfComments(podcastEntity.getComments().size());
+                    podcastModel.setNumberOfLikes(podcastEntity.getPodcast_likes().size());
+                    return podcastModel;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PodcastModel> getPodcastTrending(int pageNumber, int pageSize) {
+        // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
+        int offset = pageNumber * pageSize;
+
+        // Lấy danh sách podcast từ repository
+        List<PodcastEntity> podcastEntities = podcastRepository.findPaginatedOrderByLikesDesc(offset, pageSize);
+
+        // Ánh xạ và trả về danh sách podcast model
+        return podcastEntities.stream()
+                .map(podcastEntity -> {
+                    PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
+                    podcastModel.setNumberOfComments(podcastEntity.getComments().size());
+                    podcastModel.setNumberOfLikes(podcastEntity.getPodcast_likes().size());
+                    return podcastModel;
+                })
+                .collect(Collectors.toList());
+    }
+
 }
