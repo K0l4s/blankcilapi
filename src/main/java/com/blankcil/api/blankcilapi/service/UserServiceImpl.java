@@ -6,6 +6,7 @@ import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,13 +16,16 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 
 @Service
-@RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements IUserService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
+    @Override
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
 
         var user = (UserEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -41,6 +45,8 @@ public class UserService {
         // save the new password
         userRepository.save(user);
     }
+
+    @Override
     public UserModel getProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
@@ -50,6 +56,8 @@ public class UserService {
 
         return modelMapper.map(userEntity, UserModel.class);
     }
+
+    @Override
     public UserModel updateUser(UserModel userModel) {
         Principal connectedUser = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = connectedUser.getName();

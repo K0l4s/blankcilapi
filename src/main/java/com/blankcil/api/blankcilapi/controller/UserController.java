@@ -2,9 +2,11 @@ package com.blankcil.api.blankcilapi.controller;
 
 import com.blankcil.api.blankcilapi.model.ResponseModel;
 import com.blankcil.api.blankcilapi.model.UserModel;
+import com.blankcil.api.blankcilapi.service.IUserService;
 import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
-import com.blankcil.api.blankcilapi.service.UserService;
+import com.blankcil.api.blankcilapi.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,21 +18,22 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService service;
+    @Autowired
+    IUserService userService = new UserServiceImpl();
 
     @PatchMapping
     public ResponseEntity<?> changePassword(
           @RequestBody ChangePasswordRequest request,
           Principal connectedUser
     ) {
-        service.changePassword(request, connectedUser);
+        userService.changePassword(request, connectedUser);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/profile")
     public ResponseEntity<ResponseModel> getProfile() {
         try {
-            UserModel userModel = service.getProfile();
+            UserModel userModel = userService.getProfile();
             return ResponseEntity.ok().body(new ResponseModel(true, "Get profile successfully", userModel));
         }
         catch (Exception e) {
@@ -44,7 +47,7 @@ public class UserController {
             @RequestBody UserModel userModel
     ) {
         try {
-            UserModel updatedUser = service.updateUser(userModel);
+            UserModel updatedUser = userService.updateUser(userModel);
             return ResponseEntity.ok().body(new ResponseModel(true, "Profile updated successfully", updatedUser));
         } catch (Exception e) {
             e.printStackTrace();
