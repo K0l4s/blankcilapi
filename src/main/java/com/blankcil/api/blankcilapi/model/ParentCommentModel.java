@@ -16,7 +16,7 @@ public class ParentCommentModel implements Serializable {
     private String content;
     private LocalDateTime timestamp;
     private UserModel user_comment;
-    private int numberOfLikes;
+    private int totalLikes;
     private ParentCommentModel parentComment;
 
 }

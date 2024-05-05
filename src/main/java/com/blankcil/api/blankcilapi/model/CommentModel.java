@@ -17,9 +17,8 @@ public class CommentModel implements Serializable {
     private String content;
     private LocalDateTime timestamp;
     private UserModel user_comment;
-//    private PodcastModel podcast_comment;
 //    private List<CommentLikeModel> comment_likes;
-    private int numberOfLikes;
+    private int totalLikes;
     private ParentCommentModel parentComment;
     private List<ReplyCommentModel> replies;
 }

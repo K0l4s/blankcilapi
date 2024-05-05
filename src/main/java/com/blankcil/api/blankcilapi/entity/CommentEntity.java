@@ -36,6 +36,8 @@ public class CommentEntity {
     @OneToMany(mappedBy = "comment_like", cascade = CascadeType.ALL)
     private List<CommentLikeEntity> comment_likes;
 
+    private long totalLikes;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
     private CommentEntity parentComment;
