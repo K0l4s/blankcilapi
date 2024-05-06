@@ -9,6 +9,7 @@ import com.blankcil.api.blankcilapi.model.UserModel;
 import com.blankcil.api.blankcilapi.repository.CommentRepository;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.blankcil.api.blankcilapi.utils.FFmpegUtil;
+import com.blankcil.api.blankcilapi.utils.ImageProcessing;
 import org.modelmapper.ModelMapper;
 import com.blankcil.api.blankcilapi.model.PodcastModel;
 import com.blankcil.api.blankcilapi.repository.PodcastRepository;
@@ -18,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,7 +43,7 @@ public class PodcastServiceImpl implements IPodcastService {
     private IFirebaseService firebaseService;
 
     @Override
-    public PodcastModel createPodcast(PodcastModel podcastModel, MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException {
+    public PodcastModel createPodcast(PodcastModel podcastModel, MultipartFile imageFile, MultipartFile audioFile) throws Exception {
         PodcastEntity podcastEntity = modelMapper.map(podcastModel, PodcastEntity.class);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -52,8 +55,14 @@ public class PodcastServiceImpl implements IPodcastService {
         podcastEntity.setUser_podcast(userEntity);
         podcastEntity.setCreateDay(LocalDateTime.now());
 
+        //resize image
+        MultipartFile resizedImageBytes = ImageProcessing.resizeImageTo9by16(imageFile);
+
         //Store video URL
-        byte[] videoBytes = FFmpegUtil.combineMultipartFiles(imageFile, audioFile);
+        byte[] videoBytes = FFmpegUtil.combineMultipartFiles(resizedImageBytes, audioFile);
+        if (videoBytes.length == 0) {
+            throw new Exception("Video không hợp lệ. Vui lòng thử lại với tệp hình ảnh và âm thanh khác.");
+        }
         String videoURL = firebaseService.uploadFileToFirebase(videoBytes);
         podcastEntity.setAudio_url(videoURL);
 
