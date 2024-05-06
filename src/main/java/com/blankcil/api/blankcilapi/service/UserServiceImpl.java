@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -58,6 +59,15 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public UserModel getProfileOther(int id) {
+
+        UserEntity userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        return modelMapper.map(userEntity, UserModel.class);
+    }
+
+    @Override
     public UserModel updateUser(UserModel userModel) {
         Principal connectedUser = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = connectedUser.getName();
@@ -84,4 +94,13 @@ public class UserServiceImpl implements IUserService {
         // Trả về thông tin người dùng sau khi cập nhật
         return modelMapper.map(userEntity, UserModel.class);
     }
+
+    @Override
+    public List<UserModel> findUsersByFullname(String fullname) {
+        List<UserEntity> userEntities = userRepository.findByFullnameIgnoreCaseContaining(fullname);
+        return userEntities.stream()
+                .map(userEntity -> modelMapper.map(userEntity,UserModel.class))
+                .toList();
+    }
+
 }
