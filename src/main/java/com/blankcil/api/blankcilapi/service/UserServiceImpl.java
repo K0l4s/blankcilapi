@@ -1,6 +1,8 @@
 package com.blankcil.api.blankcilapi.service;
 
+import com.blankcil.api.blankcilapi.entity.PodcastEntity;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
+import com.blankcil.api.blankcilapi.model.ProfilePodcastModel;
 import com.blankcil.api.blankcilapi.model.UserModel;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -55,7 +58,21 @@ public class UserServiceImpl implements IUserService {
         UserEntity userEntity = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
 
-        return modelMapper.map(userEntity, UserModel.class);
+        // Lấy danh sách podcast của user
+        List<ProfilePodcastModel> profilePodcasts = new ArrayList<>();
+        for (PodcastEntity podcastEntity : userEntity.getPodcasts()) {
+            ProfilePodcastModel profilePodcastModel = modelMapper.map(podcastEntity, ProfilePodcastModel.class);
+            // Lấy số lượng likes cho podcast
+            int numberOfLikes = podcastEntity.getPodcast_likes().size();
+            profilePodcastModel.setNumberOfLikes(numberOfLikes);
+            profilePodcasts.add(profilePodcastModel);
+        }
+
+        // Tạo UserModel và set danh sách podcasts
+        UserModel userModel = modelMapper.map(userEntity, UserModel.class);
+        userModel.setPodcasts(profilePodcasts);
+
+        return userModel;
     }
 
     @Override
@@ -64,7 +81,21 @@ public class UserServiceImpl implements IUserService {
         UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        return modelMapper.map(userEntity, UserModel.class);
+        // Lấy danh sách podcast của user
+        List<ProfilePodcastModel> profilePodcasts = new ArrayList<>();
+        for (PodcastEntity podcastEntity : userEntity.getPodcasts()) {
+            ProfilePodcastModel profilePodcastModel = modelMapper.map(podcastEntity, ProfilePodcastModel.class);
+            // Lấy số lượng likes cho podcast
+            int numberOfLikes = podcastEntity.getPodcast_likes().size();
+            profilePodcastModel.setNumberOfLikes(numberOfLikes);
+            profilePodcasts.add(profilePodcastModel);
+        }
+
+        // Tạo UserModel và set danh sách podcasts
+        UserModel userModel = modelMapper.map(userEntity, UserModel.class);
+        userModel.setPodcasts(profilePodcasts);
+
+        return userModel;
     }
 
     @Override
