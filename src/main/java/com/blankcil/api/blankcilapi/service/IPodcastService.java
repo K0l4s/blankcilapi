@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IPodcastService {
-    PodcastModel createPodcast(PodcastModel podcastModel, MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException;
+    PodcastModel createPodcast(PodcastModel podcastModel, MultipartFile imageFile, MultipartFile audioFile) throws Exception;
     List<PodcastModel> getAllPodcasts();
     PodcastModel getPodcast(int id);
     List<PodcastModel> getPodcastsByPage(int pageNumber, int pageSize);

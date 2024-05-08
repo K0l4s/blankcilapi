@@ -26,7 +26,11 @@ public class FFmpegUtil {
         File outputVideoFile = File.createTempFile("output-video", ".mp4", tempDirectory);
 
         // Gọi ffmpeg để gộp ảnh và audio thành video
-        ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-y", "-loop", "1", "-i", tempImageFile.getAbsolutePath(), "-i", tempAudioFile.getAbsolutePath(), "-c:v", "libx264", "-c:a", "aac", "-strict", "experimental", "-b:a", "192k", "-shortest", outputVideoFile.getAbsolutePath());
+        ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-y", "-loop", "1",
+                "-i", tempImageFile.getAbsolutePath(),
+                "-i", tempAudioFile.getAbsolutePath(),
+                "-c:v", "libx264", "-c:a", "aac", "-strict", "experimental",
+                "-b:a", "192k", "-shortest", outputVideoFile.getAbsolutePath());
 
         processBuilder.redirectErrorStream(true);
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File("FFmpeg-log.txt")));
