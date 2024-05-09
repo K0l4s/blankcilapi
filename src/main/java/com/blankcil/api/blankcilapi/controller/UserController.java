@@ -84,4 +84,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
         }
     }
+
+    @PostMapping("/like/podcast/{id}")
+    public ResponseEntity<ResponseModel> likePodcast(@PathVariable("id") int id) {
+        try {
+            String msg = userService.likePodcast(id);
+            return ResponseEntity.ok().body(new ResponseModel(true, "Success: " + msg, null));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
+        }
+    }
 }
