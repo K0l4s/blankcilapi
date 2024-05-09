@@ -12,4 +12,5 @@ public interface IUserService {
     UserModel getProfileOther(int id);
     UserModel updateUser(UserModel userModel);
     List<UserModel> findUsersByFullname(String fullname);
+    String likePodcast(int podcastId);
 }
