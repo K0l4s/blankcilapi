@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FFmpegUtil {
     public static File VIDEO_FILE = null;
-    public static byte[] combineMultipartFiles(MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException {
+    public synchronized static byte[] combineMultipartFiles(MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException {
         // Lấy đường dẫn tương đối đến thư mục temp mặc định
         String tempDirPath = System.getProperty("java.io.tmpdir");
         File tempDirectory = new File(tempDirPath);
@@ -33,7 +33,16 @@ public class FFmpegUtil {
                 "-b:a", "192k", "-shortest", outputVideoFile.getAbsolutePath());
 
         processBuilder.redirectErrorStream(true);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File("FFmpeg-log.txt")));
+        // Đường dẫn đến file log
+        File logFile = new File(tempDirPath, "FFmpeg-log.txt");
+
+        // Kiểm tra xem file log đã tồn tại chưa
+        if (!logFile.exists()) {
+            logFile.createNewFile(); // Nếu chưa tồn tại, tạo mới file log
+        }
+
+        // Ghi log ra file log
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(logFile));
 
         Process process = processBuilder.start();
 
