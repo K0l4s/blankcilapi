@@ -19,11 +19,12 @@ public class PodcastModel implements Serializable {
     private String title;
     private String audio_url;
     private String content;
+    private boolean hasLiked;
     private LocalDateTime createDay;
-    private UserModel user_podcast;
-//    private List<CommentModel> comments;
     private int numberOfComments;
     private int numberOfLikes;
+    private UserModel user_podcast;
+//    private List<CommentModel> comments;
 //    @JsonManagedReference
 //    private List<PodcastLikeModel> podcast_likes;
 }

@@ -115,6 +115,37 @@ public class PodcastServiceImpl implements IPodcastService {
     }
 
     @Override
+    public List<PodcastModel> getPodcastsByPageWithAuth(int pageNumber, int pageSize) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String userEmail = authentication.getName();
+        UserEntity userEntity = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+
+        // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
+        int offset = pageNumber * pageSize;
+
+        // Lấy danh sách podcast từ repository
+        List<PodcastEntity> podcastEntities = podcastRepository.findPaginated(offset, pageSize);
+
+        // Ánh xạ và trả về danh sách podcast model
+        return podcastEntities.stream()
+                .map(podcastEntity -> {
+                    PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
+                    podcastModel.setNumberOfComments(podcastEntity.getComments().size());
+                    podcastModel.setNumberOfLikes(podcastEntity.getPodcast_likes().size());
+
+                    //Kiem tra xem user dang login da like podcast nay chua ?
+                    boolean hasLiked = podcastEntity.getPodcast_likes().stream()
+                            .anyMatch(podcastLikeEntity -> podcastLikeEntity.getUser_podcast_like().equals(userEntity));
+                    podcastModel.setHasLiked(hasLiked);
+
+                    return podcastModel;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<PodcastModel> getPodcastTrending(int pageNumber, int pageSize) {
         // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
         int offset = pageNumber * pageSize;
@@ -133,4 +164,34 @@ public class PodcastServiceImpl implements IPodcastService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<PodcastModel> getPodcastTrendingWithAuth(int pageNumber, int pageSize) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String userEmail = authentication.getName();
+        UserEntity userEntity = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+
+        // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
+        int offset = pageNumber * pageSize;
+
+        // Lấy danh sách podcast từ repository
+        List<PodcastEntity> podcastEntities = podcastRepository.findPaginatedOrderByLikesDesc(offset, pageSize);
+
+        // Ánh xạ và trả về danh sách podcast model
+        return podcastEntities.stream()
+                .map(podcastEntity -> {
+                    PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
+                    podcastModel.setNumberOfComments(podcastEntity.getComments().size());
+                    podcastModel.setNumberOfLikes(podcastEntity.getPodcast_likes().size());
+
+                    //Kiem tra xem user dang login da like podcast nay chua ?
+                    boolean hasLiked = podcastEntity.getPodcast_likes().stream()
+                            .anyMatch(podcastLikeEntity -> podcastLikeEntity.getUser_podcast_like().equals(userEntity));
+                    podcastModel.setHasLiked(hasLiked);
+
+                    return podcastModel;
+                })
+                .collect(Collectors.toList());
+    }
 }

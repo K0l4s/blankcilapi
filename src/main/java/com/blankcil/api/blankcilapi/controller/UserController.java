@@ -1,5 +1,6 @@
 package com.blankcil.api.blankcilapi.controller;
 
+import com.blankcil.api.blankcilapi.model.CommentModel;
 import com.blankcil.api.blankcilapi.model.ResponseModel;
 import com.blankcil.api.blankcilapi.model.UserModel;
 import com.blankcil.api.blankcilapi.service.IUserService;
@@ -89,10 +90,22 @@ public class UserController {
     public ResponseEntity<ResponseModel> likePodcast(@PathVariable("id") int id) {
         try {
             String msg = userService.likePodcast(id);
-            return ResponseEntity.ok().body(new ResponseModel(true, "Success: " + msg, null));
+            return ResponseEntity.ok().body(new ResponseModel(true, msg, null));
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
+        }
+    }
+
+    @PostMapping("/comment/podcast")
+    public ResponseEntity<ResponseModel> commentOnPodcast(@RequestParam("content") String content,
+                                                          @RequestParam("podcastId") int podcastId) {
+        try {
+            CommentModel comment = userService.commentOnPodcast(content, podcastId);
+            return ResponseEntity.ok().body(new ResponseModel(true, "Profile updated successfully", comment));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to update profile", null));
         }
     }
 }

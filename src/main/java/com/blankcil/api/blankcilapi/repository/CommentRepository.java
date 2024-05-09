@@ -21,7 +21,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     @Query("SELECT c, COUNT(cl) AS totalLikes " +
             "FROM CommentEntity c " +
             "LEFT JOIN c.comment_likes cl " +
-            "WHERE c.podcast_comment.id = :podcastId " +
+            "WHERE c.podcast_comment.id = :podcastId AND c.parentComment IS NULL " + // Chỉ sắp xếp các bình luận gốc
             "GROUP BY c " +
             "ORDER BY c.timestamp DESC")
     Page<Object[]> getCommentsWithTotalLikesForPodcast(Long podcastId, Pageable pageable);
