@@ -64,7 +64,7 @@ public class PodcastController {
     @GetMapping("/view/page")
     public ResponseEntity<ResponseModel> getPodcastsByPage(
             @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
             @RequestParam(value = "trending", defaultValue = "false") boolean trending)
     {
         try {
@@ -81,10 +81,10 @@ public class PodcastController {
         }
     }
 
-    @GetMapping("auth/view/page")
+    @GetMapping("/auth/view/page")
     public ResponseEntity<ResponseModel> getPodcastsByPageWithAuth(
             @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
             @RequestParam(value = "trending", defaultValue = "false") boolean trending)
     {
         try {

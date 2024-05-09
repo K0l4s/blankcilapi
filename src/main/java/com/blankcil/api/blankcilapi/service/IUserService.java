@@ -1,5 +1,6 @@
 package com.blankcil.api.blankcilapi.service;
 
+import com.blankcil.api.blankcilapi.model.CommentModel;
 import com.blankcil.api.blankcilapi.model.UserModel;
 import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
 
@@ -13,4 +14,5 @@ public interface IUserService {
     UserModel updateUser(UserModel userModel);
     List<UserModel> findUsersByFullname(String fullname);
     String likePodcast(int podcastId);
+    CommentModel commentOnPodcast(String content, int podcastId);
 }
