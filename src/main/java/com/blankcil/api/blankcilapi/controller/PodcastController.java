@@ -81,6 +81,26 @@ public class PodcastController {
         }
     }
 
+    @GetMapping("auth/view/page")
+    public ResponseEntity<ResponseModel> getPodcastsByPageWithAuth(
+            @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(value = "trending", defaultValue = "false") boolean trending)
+    {
+        try {
+            List<PodcastModel> podcasts;
+            if (trending) {
+                podcasts = podcastService.getPodcastTrendingWithAuth(pageNumber, pageSize);
+            } else {
+                podcasts = podcastService.getPodcastsByPageWithAuth(pageNumber, pageSize);
+            }
+            return ResponseEntity.ok(new ResponseModel(true, "Get successfully", podcasts));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed", null));
+        }
+    }
+
     @GetMapping("/view/{id}/comments")
     public ResponseEntity<ResponseModel> getCommentsForPodcast(@PathVariable int id,
                                                                @PageableDefault(size = 10, page = 0) Pageable pageable) {

@@ -12,5 +12,9 @@ public interface IPodcastService {
     List<PodcastModel> getAllPodcasts();
     PodcastModel getPodcast(int id);
     List<PodcastModel> getPodcastsByPage(int pageNumber, int pageSize);
+    List<PodcastModel> getPodcastsByPageWithAuth(int pageNumber, int pageSize);
+
     List<PodcastModel> getPodcastTrending(int pageNumber, int pageSize);
+    List<PodcastModel> getPodcastTrendingWithAuth(int pageNumber, int pageSize);
+
 }
