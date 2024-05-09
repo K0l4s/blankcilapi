@@ -14,5 +14,5 @@ public class CommentLikeModel implements Serializable {
     private Long id;
     private LocalDateTime timestamp;
     private CommentModel comment_like;
-    private UserModel user_comment_like;
+    private UserCommentModel user_comment_like;
 }

@@ -3,6 +3,7 @@ package com.blankcil.api.blankcilapi.service;
 import com.blankcil.api.blankcilapi.entity.CommentEntity;
 import com.blankcil.api.blankcilapi.model.CommentModel;
 import com.blankcil.api.blankcilapi.model.ParentCommentModel;
+import com.blankcil.api.blankcilapi.model.UserCommentModel;
 import com.blankcil.api.blankcilapi.model.UserModel;
 import com.blankcil.api.blankcilapi.repository.CommentRepository;
 import com.blankcil.api.blankcilapi.repository.PodcastRepository;
@@ -47,7 +48,7 @@ public class CommentServiceImpl implements ICommentService {
                         // Ánh xạ thông tin user_comment cho parentComment của reply
                         if (reply.getParentComment() != null) {
                             ParentCommentModel parentCommentModel = modelMapper.map(reply.getParentComment(), ParentCommentModel.class);
-                            parentCommentModel.setUser_comment(modelMapper.map(reply.getParentComment().getUser_comment(), UserModel.class));
+                            parentCommentModel.setUser_comment(modelMapper.map(reply.getParentComment().getUser_comment(), UserCommentModel.class));
                         }
                     }
 
@@ -57,7 +58,7 @@ public class CommentServiceImpl implements ICommentService {
                     // Tiếp tục ánh xạ dữ liệu user_comment cho parentComment nếu có
                     if (commentEntity.getParentComment() != null) {
                         ParentCommentModel parentCommentModel = modelMapper.map(commentEntity.getParentComment(), ParentCommentModel.class);
-                        parentCommentModel.setUser_comment(modelMapper.map(commentEntity.getParentComment().getUser_comment(), UserModel.class));
+                        parentCommentModel.setUser_comment(modelMapper.map(commentEntity.getParentComment().getUser_comment(), UserCommentModel.class));
                         commentModel.setParentComment(parentCommentModel);
                     }
                     return commentModel;
