@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -42,6 +43,20 @@ public class UserController {
         }
     }
 
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<ResponseModel> getProfileOther(@PathVariable int id) {
+        try {
+            UserModel userModel = userService.getProfileOther(id);
+            return ResponseEntity.ok().body(new ResponseModel(true, "Get profile successfully", userModel));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to get profile", null));
+        }
+    }
+
+
+
     @PutMapping("/profile/edit")
     public ResponseEntity<ResponseModel> updateProfile(
             @RequestBody UserModel userModel
@@ -52,6 +67,32 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to update profile", null));
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ResponseModel> searchUsersByFullname(@RequestParam("name") String fullname) {
+        try {
+            List<UserModel> users = userService.findUsersByFullname(fullname);
+            if(users.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseModel(false, "User not found", null));
+            }
+            return ResponseEntity.ok().body(new ResponseModel(true, "Found", users));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
+        }
+    }
+
+    @PostMapping("/like/podcast/{id}")
+    public ResponseEntity<ResponseModel> likePodcast(@PathVariable("id") int id) {
+        try {
+            String msg = userService.likePodcast(id);
+            return ResponseEntity.ok().body(new ResponseModel(true, "Success: " + msg, null));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
         }
     }
 }

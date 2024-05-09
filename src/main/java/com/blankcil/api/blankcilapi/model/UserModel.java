@@ -8,6 +8,7 @@ import net.minidev.json.annotate.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,4 +19,5 @@ public class UserModel implements Serializable {
     private LocalDate birthday;
     private String address;
     private String phone;
+    private List<ProfilePodcastModel> podcasts;
 }
