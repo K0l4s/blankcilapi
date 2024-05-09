@@ -28,6 +28,7 @@ public class PodcastController {
     @Autowired
     ICommentService commentService = new CommentServiceImpl();
 
+    @CrossOrigin
     @PostMapping("/upload")
     public ResponseEntity<ResponseModel>createPodcast(@ModelAttribute PodcastModel podcastModel,
                                                       @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,

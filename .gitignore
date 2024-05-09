@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Log ###
-FFmpeg-log.txt
+./FFmpeg-log.txt
