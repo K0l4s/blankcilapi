@@ -158,7 +158,7 @@ public class UserServiceImpl implements IUserService {
         PodcastLikeEntity existingLike = findExistingLike(user, podcast);
         if (existingLike != null) {
             podcastLikeRepository.delete(existingLike);
-            return "Ban vua redo like cua podcast: " + podcastId;
+            return "Unliked";
         } else {
             PodcastLikeEntity like = PodcastLikeEntity.builder()
                     .timestamp(LocalDateTime.now())
@@ -167,7 +167,7 @@ public class UserServiceImpl implements IUserService {
                     .build();
 
             podcastLikeRepository.save(like);
-            return "Ban vua like podcast " + podcastId;
+            return "Liked";
         }
     }
 
