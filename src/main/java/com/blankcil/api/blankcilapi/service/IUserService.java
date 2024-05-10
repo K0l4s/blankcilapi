@@ -15,4 +15,5 @@ public interface IUserService {
     List<UserModel> findUsersByFullname(String fullname);
     String likePodcast(int podcastId);
     CommentModel commentOnPodcast(String content, int podcastId);
+    CommentModel replyComment(String content, long parentCommentId);
 }

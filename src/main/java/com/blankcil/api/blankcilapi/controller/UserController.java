@@ -102,10 +102,22 @@ public class UserController {
                                                           @RequestParam("podcastId") int podcastId) {
         try {
             CommentModel comment = userService.commentOnPodcast(content, podcastId);
-            return ResponseEntity.ok().body(new ResponseModel(true, "Profile updated successfully", comment));
+            return ResponseEntity.ok().body(new ResponseModel(true, "Comment successfully", comment));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to update profile", null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed!!", null));
+        }
+    }
+
+    @PostMapping("/reply/comment")
+    public ResponseEntity<ResponseModel> replyOnComment(@RequestParam("content") String content,
+                                                          @RequestParam("commentId") int commentId) {
+        try {
+            CommentModel comment = userService.replyComment(content, commentId);
+            return ResponseEntity.ok().body(new ResponseModel(true, "Reply comment successfully", comment));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed!!", null));
         }
     }
 }

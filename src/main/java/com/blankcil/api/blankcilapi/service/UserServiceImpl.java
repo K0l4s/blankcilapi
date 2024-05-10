@@ -202,8 +202,36 @@ public class UserServiceImpl implements IUserService {
                 .podcast_comment(podcastEntity)
                 .user_comment(userEntity)
                 .totalLikes(0)
+                .totalReplies(0)
                 .build();
         commentRepository.save(commentEntity);
         return modelMapper.map(commentEntity, CommentModel.class);
     }
+
+    @Override
+    public CommentModel replyComment(String content, long parentCommentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+
+        UserEntity userEntity = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        CommentEntity commentEntity = commentRepository.findById(parentCommentId)
+                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+
+        PodcastEntity podcastEntity = commentEntity.getPodcast_comment();
+
+        CommentEntity replyComment = CommentEntity.builder()
+                .content(content)
+                .timestamp(LocalDateTime.now())
+                .parentComment(commentEntity)
+                .podcast_comment(podcastEntity)
+                .user_comment(userEntity)
+                .totalLikes(0)
+                .totalReplies(0)
+                .build();
+        commentRepository.save(replyComment);
+        return modelMapper.map(replyComment, CommentModel.class);
+    }
+
 }
