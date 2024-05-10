@@ -2,6 +2,7 @@ package com.blankcil.api.blankcilapi.controller;
 
 import com.blankcil.api.blankcilapi.model.CommentModel;
 import com.blankcil.api.blankcilapi.model.PodcastModel;
+import com.blankcil.api.blankcilapi.model.ReplyCommentModel;
 import com.blankcil.api.blankcilapi.model.ResponseModel;
 import com.blankcil.api.blankcilapi.service.CommentServiceImpl;
 import com.blankcil.api.blankcilapi.service.ICommentService;
@@ -111,6 +112,18 @@ public class PodcastController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseModel(false, "Failed to get comments", null));
+        }
+    }
+
+    @GetMapping("/view/replies/{id}")
+    public ResponseEntity<ResponseModel> getReplies(@PathVariable long id) {
+        try {
+            List<ReplyCommentModel> replies = commentService.getReplies(id);
+            return ResponseEntity.ok(new ResponseModel(true, "Get replies successfully", replies));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to get comment", null));
         }
     }
 }

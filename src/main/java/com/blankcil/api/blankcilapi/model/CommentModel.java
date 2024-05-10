@@ -19,6 +19,7 @@ public class CommentModel implements Serializable {
     private UserCommentModel user_comment;
 //    private List<CommentLikeModel> comment_likes;
     private int totalLikes;
+    private int totalReplies;
     private ParentCommentModel parentComment;
     private List<ReplyCommentModel> replies;
 }
