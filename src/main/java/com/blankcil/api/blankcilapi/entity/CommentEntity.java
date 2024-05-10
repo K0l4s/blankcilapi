@@ -37,6 +37,7 @@ public class CommentEntity {
     private List<CommentLikeEntity> comment_likes;
 
     private long totalLikes;
+    private long totalReplies;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
