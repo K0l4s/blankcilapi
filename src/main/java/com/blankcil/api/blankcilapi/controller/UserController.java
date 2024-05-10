@@ -60,7 +60,7 @@ public class UserController {
 
     @PutMapping("/profile/edit")
     public ResponseEntity<ResponseModel> updateProfile(
-            @RequestBody UserModel userModel
+            @ModelAttribute UserModel userModel
     ) {
         try {
             UserModel updatedUser = userService.updateUser(userModel);
