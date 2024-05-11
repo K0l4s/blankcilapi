@@ -21,4 +21,5 @@ public interface PodcastRepository extends JpaRepository<PodcastEntity, Integer>
             "LIMIT :pageSize OFFSET :offset",
             nativeQuery = true)
     List<PodcastEntity> findPaginatedOrderByLikesDesc(@Param("offset") int offset, @Param("pageSize") int pageSize);
+    List<PodcastEntity> findByTitleIgnoreCaseContainingOrContentIgnoreCaseContaining(String title, String content);
 }

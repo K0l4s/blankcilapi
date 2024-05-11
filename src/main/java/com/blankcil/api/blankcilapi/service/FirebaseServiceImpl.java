@@ -62,6 +62,7 @@ public class FirebaseServiceImpl implements IFirebaseService {
 
     @Override
     public String uploadImageToFirebase(MultipartFile imageFile, String type) throws IOException {
+        System.out.println(imageFile);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
 
@@ -72,8 +73,13 @@ public class FirebaseServiceImpl implements IFirebaseService {
 
         Storage storage = firebaseStorage;
 
-        // Generate unique image name
-        String imageName = UUID.randomUUID() + ".jpg";
+        // Get file extension
+        String originalFilename = imageFile.getOriginalFilename();
+        assert originalFilename != null;
+        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.') + 1);
+
+        // Generate unique image name with original file extension
+        String imageName = UUID.randomUUID() + "." + fileExtension;
 
         String folderName = switch (type) {
             case "thumbnail" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + PODCAST_FOLDER + THUMBNAIL_FOLDER;
@@ -144,21 +150,9 @@ public class FirebaseServiceImpl implements IFirebaseService {
             // Tạo thư mục Info/cover
             createFolder(storage, folderName + INFO_FOLDER, COVER_FOLDER);
         }
-//        String folderName = "main/" + userId + "-" + userName + "/";
-//        BlobId folderBlobId = BlobId.of(bucketName, folderName);
-//        Storage storage = firebaseStorage;
-//        // Kiểm tra xem thư mục đã tồn tại chưa
-//        if (!isFolderExists(storage, folderBlobId)) {
-//            // Nếu chưa tồn tại, tạo mới thư mục
-//            BlobInfo blobInfo = BlobInfo.newBuilder(folderBlobId).build();
-//            storage.create(blobInfo);
-//        }
+
     }
 
-//    private boolean isFolderExists(Storage storage, BlobId blobId) {
-//        Blob blob = storage.get(blobId);
-//        return blob != null && blob.exists();
-//    }
 
     // Hàm kiểm tra xem thư mục đã tồn tại hay chưa
     private boolean isFolderExists(Storage storage, String folderName) {
