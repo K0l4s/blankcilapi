@@ -20,6 +20,7 @@ public class PodcastEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
+    private String thumbnail_url;
     private String audio_url;
     private String content;
     private LocalDateTime createDay;

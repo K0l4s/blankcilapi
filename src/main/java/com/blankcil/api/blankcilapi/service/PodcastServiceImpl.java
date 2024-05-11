@@ -63,8 +63,11 @@ public class PodcastServiceImpl implements IPodcastService {
         if (videoBytes.length == 0) {
             throw new Exception("Video không hợp lệ. Vui lòng thử lại với tệp hình ảnh và âm thanh khác.");
         }
-        String videoURL = firebaseService.uploadFileToFirebase(videoBytes);
+        String videoURL = firebaseService.uploadVideoToFirebase(videoBytes);
         podcastEntity.setAudio_url(videoURL);
+
+        String thumbnailURL = firebaseService.uploadImageToFirebase(resizedImageBytes, "thumbnail");
+        podcastEntity.setThumbnail_url(thumbnailURL);
 
         podcastRepository.save(podcastEntity);
         return modelMapper.map(podcastEntity, PodcastModel.class);
@@ -115,12 +118,14 @@ public class PodcastServiceImpl implements IPodcastService {
     }
 
     @Override
-    public List<PodcastModel> getPodcastsByPageWithAuth(int pageNumber, int pageSize) {
+    public List<PodcastModel> getPodcastsByPageWithAuth(int pageNumber, int pageSize) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         String userEmail = authentication.getName();
         UserEntity userEntity = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+
+        firebaseService.createUserFolder(userEntity.getId().toString(), userEmail);
 
         // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
         int offset = pageNumber * pageSize;
