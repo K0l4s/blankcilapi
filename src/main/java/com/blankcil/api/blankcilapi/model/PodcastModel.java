@@ -17,6 +17,7 @@ import java.util.List;
 public class PodcastModel implements Serializable {
     private long id;
     private String title;
+    private String thumbnail_url;
     private String audio_url;
     private String content;
     private boolean hasLiked;

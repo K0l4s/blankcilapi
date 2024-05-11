@@ -17,6 +17,14 @@ import java.util.UUID;
 
 @Service
 public class FirebaseServiceImpl implements IFirebaseService {
+    private static final String MAIN_FOLDER = "main/";
+    private static final String PODCAST_FOLDER = "podcasts/";
+    private static final String VIDEOS_FOLDER = "videos/";
+    private static final String THUMBNAIL_FOLDER = "thumbnail/";
+    private static final String INFO_FOLDER = "info/";
+    private static final String AVATAR_FOLDER = "avatar/";
+    private static final String COVER_FOLDER = "cover/";
+
     @Value("${firebase.storage.bucket}")
     private String bucketName;
 
@@ -27,7 +35,7 @@ public class FirebaseServiceImpl implements IFirebaseService {
     private UserRepository userRepository;
 
     @Override
-    public String uploadFileToFirebase(byte[] videoBytes) throws IOException {
+    public String uploadVideoToFirebase(byte[] videoBytes) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
 
@@ -43,13 +51,45 @@ public class FirebaseServiceImpl implements IFirebaseService {
         String fileName = UUID.randomUUID() + ".mp4";
 
         // Upload video byte array lên bucket Firebase Storage
-        String folderName = "main/" + userId + "-" + userEmail + "/";
+        String folderName = MAIN_FOLDER + userId + "-" + userEmail + "/" + PODCAST_FOLDER + VIDEOS_FOLDER;
         BlobId blobId = BlobId.of(bucketName, folderName + fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("video/mp4").build();
         Blob blob = storage.create(blobInfo, videoBytes);
 
         FFmpegUtil.deleteTempFile(FFmpegUtil.VIDEO_FILE);
         return  blob.getMediaLink();
+    }
+
+    @Override
+    public String uploadImageToFirebase(MultipartFile imageFile, String type) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+
+        UserEntity userEntity = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+
+        String userId = userEntity.getId().toString();
+
+        Storage storage = firebaseStorage;
+
+        // Generate unique image name
+        String imageName = UUID.randomUUID() + ".jpg";
+
+        String folderName = switch (type) {
+            case "thumbnail" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + PODCAST_FOLDER + THUMBNAIL_FOLDER;
+            case "avatar" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + AVATAR_FOLDER;
+            case "cover" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + COVER_FOLDER;
+            default -> null;
+        };
+
+        // Upload image to bucket
+        BlobId blobId = BlobId.of(bucketName, folderName + imageName);
+
+        try (InputStream inputStream = imageFile.getInputStream()) {
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(imageFile.getContentType()).build();
+            Blob blob = storage.create(blobInfo, inputStream.readAllBytes());
+            return blob.getMediaLink();
+        }
     }
 
     public String storeTempFile(MultipartFile file) throws IOException {
@@ -78,19 +118,60 @@ public class FirebaseServiceImpl implements IFirebaseService {
 
     @Override
     public void createUserFolder(String userId, String userName) throws IOException {
-        String folderName = "main/" + userId + "-" + userName + "/";
-        BlobId folderBlobId = BlobId.of(bucketName, folderName);
+        String folderName = MAIN_FOLDER + userId + "-" + userName + "/";
+//        BlobId folderBlobId = BlobId.of(bucketName, folderName);
         Storage storage = firebaseStorage;
+
         // Kiểm tra xem thư mục đã tồn tại chưa
-        if (!isFolderExists(storage, folderBlobId)) {
-            // Nếu chưa tồn tại, tạo mới thư mục
-            BlobInfo blobInfo = BlobInfo.newBuilder(folderBlobId).build();
-            storage.create(blobInfo);
+        if (!isFolderExists(storage, folderName)) {
+            createFolder(storage, null, folderName);
+
+            // Tạo thư mục Podcast
+            createFolder(storage, folderName, PODCAST_FOLDER);
+
+            // Tạo thư mục Podcast/videos
+            createFolder(storage, folderName + PODCAST_FOLDER, VIDEOS_FOLDER);
+
+            // Tạo thư mục Podcast/thumbnail
+            createFolder(storage, folderName + PODCAST_FOLDER, THUMBNAIL_FOLDER);
+
+            // Tạo thư mục Info
+            createFolder(storage, folderName, INFO_FOLDER);
+
+            // Tạo thư mục Info/avatar
+            createFolder(storage, folderName + INFO_FOLDER, AVATAR_FOLDER);
+
+            // Tạo thư mục Info/cover
+            createFolder(storage, folderName + INFO_FOLDER, COVER_FOLDER);
         }
+//        String folderName = "main/" + userId + "-" + userName + "/";
+//        BlobId folderBlobId = BlobId.of(bucketName, folderName);
+//        Storage storage = firebaseStorage;
+//        // Kiểm tra xem thư mục đã tồn tại chưa
+//        if (!isFolderExists(storage, folderBlobId)) {
+//            // Nếu chưa tồn tại, tạo mới thư mục
+//            BlobInfo blobInfo = BlobInfo.newBuilder(folderBlobId).build();
+//            storage.create(blobInfo);
+//        }
     }
 
-    private boolean isFolderExists(Storage storage, BlobId blobId) {
+//    private boolean isFolderExists(Storage storage, BlobId blobId) {
+//        Blob blob = storage.get(blobId);
+//        return blob != null && blob.exists();
+//    }
+
+    // Hàm kiểm tra xem thư mục đã tồn tại hay chưa
+    private boolean isFolderExists(Storage storage, String folderName) {
+        BlobId blobId = BlobId.of(bucketName, folderName);
         Blob blob = storage.get(blobId);
-        return blob != null && blob.exists();
+        return blob != null;
+    }
+
+    // Hàm tạo thư mục mới
+    private void createFolder(Storage storage, String parentFolder, String folderName) {
+        String fullPath = parentFolder + folderName + "/";
+        BlobId blobId = BlobId.of(bucketName, fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/x-directory").build();
+        storage.create(blobInfo);
     }
 }

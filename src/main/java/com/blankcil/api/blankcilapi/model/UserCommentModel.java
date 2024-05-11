@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public class UserCommentModel implements Serializable {
     private Integer id;
     private String fullname;
+    private String avatar_url;
     private String email;
 //    private LocalDate birthday;
 //    private String address;

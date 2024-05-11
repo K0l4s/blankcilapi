@@ -11,6 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ProfilePodcastModel implements Serializable {
     private long id;
+    private String thumbnail_url;
     private String audio_url;
     private String content;
     private int numberOfLikes;

@@ -16,6 +16,8 @@ import java.util.List;
 public class UserModel implements Serializable {
     private Integer id;
     private String fullname;
+    private String avatar_url;
+    private String cover_url;
     private String email;
     private LocalDate birthday;
     private String address;
