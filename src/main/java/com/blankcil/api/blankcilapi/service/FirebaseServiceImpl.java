@@ -79,14 +79,29 @@ public class FirebaseServiceImpl implements IFirebaseService {
         String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.') + 1);
 
         // Generate unique image name with original file extension
-        String imageName = UUID.randomUUID() + "." + fileExtension;
+//        String imageName = UUID.randomUUID() + "." + fileExtension;
 
-        String folderName = switch (type) {
-            case "thumbnail" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + PODCAST_FOLDER + THUMBNAIL_FOLDER;
-            case "avatar" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + AVATAR_FOLDER;
-            case "cover" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + COVER_FOLDER;
-            default -> null;
-        };
+        String imageName;
+        String folderName;
+
+        switch (type) {
+            case "thumbnail":
+                imageName = UUID.randomUUID() + "." + fileExtension;
+                folderName = MAIN_FOLDER + userId + "-" + userEmail + "/" + PODCAST_FOLDER + THUMBNAIL_FOLDER;
+                break;
+            case "avatar":
+                imageName = "avatar_image" + "." + fileExtension;
+                folderName = MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + AVATAR_FOLDER;
+                break;
+            case "cover":
+                imageName = "cover_image" + "." + fileExtension;
+                folderName = MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + COVER_FOLDER;
+                break;
+            default:
+                imageName = null;
+                folderName = null;
+                break;
+        }
 
         // Upload image to bucket
         BlobId blobId = BlobId.of(bucketName, folderName + imageName);
