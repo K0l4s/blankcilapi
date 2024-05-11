@@ -9,4 +9,5 @@ public interface IFirebaseService {
     String uploadVideoToFirebase(byte[] videoBytes) throws IOException;
     String uploadImageToFirebase(MultipartFile imageFile, String type) throws IOException;
     void createUserFolder(String userId, String userName) throws IOException;
+    void deleteFileFromFirebase(String filePath);
 }

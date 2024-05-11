@@ -168,4 +168,15 @@ public class FirebaseServiceImpl implements IFirebaseService {
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/x-directory").build();
         storage.create(blobInfo);
     }
+
+    @Override
+    public void deleteFileFromFirebase(String filePath) {
+        if (filePath == null) {
+            return;
+        }
+        Storage storage = firebaseStorage;
+        BlobId blobId = BlobId.of(bucketName, filePath);
+        storage.delete(blobId);
+    }
+
 }
