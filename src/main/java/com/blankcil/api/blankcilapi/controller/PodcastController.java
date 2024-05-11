@@ -1,9 +1,6 @@
 package com.blankcil.api.blankcilapi.controller;
 
-import com.blankcil.api.blankcilapi.model.CommentModel;
-import com.blankcil.api.blankcilapi.model.PodcastModel;
-import com.blankcil.api.blankcilapi.model.ReplyCommentModel;
-import com.blankcil.api.blankcilapi.model.ResponseModel;
+import com.blankcil.api.blankcilapi.model.*;
 import com.blankcil.api.blankcilapi.service.CommentServiceImpl;
 import com.blankcil.api.blankcilapi.service.ICommentService;
 import com.blankcil.api.blankcilapi.service.IPodcastService;
@@ -69,13 +66,13 @@ public class PodcastController {
             @RequestParam(value = "trending", defaultValue = "false") boolean trending)
     {
         try {
-            List<PodcastModel> podcasts;
+            PageResponse<PodcastModel> pageResponse;
             if (trending) {
-                podcasts = podcastService.getPodcastTrending(pageNumber, pageSize);
+                pageResponse = podcastService.getPodcastTrending(pageNumber, pageSize);
             } else {
-                podcasts = podcastService.getPodcastsByPage(pageNumber, pageSize);
+                pageResponse = podcastService.getPodcastsByPage(pageNumber, pageSize);
             }
-            return ResponseEntity.ok(new ResponseModel(true, "Get successfully", podcasts));
+            return ResponseEntity.ok(new ResponseModel(true, "Get successfully", pageResponse));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed", null));
@@ -89,13 +86,13 @@ public class PodcastController {
             @RequestParam(value = "trending", defaultValue = "false") boolean trending)
     {
         try {
-            List<PodcastModel> podcasts;
+            PageResponse<PodcastModel> pageResponse;
             if (trending) {
-                podcasts = podcastService.getPodcastTrendingWithAuth(pageNumber, pageSize);
+                pageResponse = podcastService.getPodcastTrendingWithAuth(pageNumber, pageSize);
             } else {
-                podcasts = podcastService.getPodcastsByPageWithAuth(pageNumber, pageSize);
+                pageResponse = podcastService.getPodcastsByPageWithAuth(pageNumber, pageSize);
             }
-            return ResponseEntity.ok(new ResponseModel(true, "Get successfully", podcasts));
+            return ResponseEntity.ok(new ResponseModel(true, "Get successfully", pageResponse));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed", null));
