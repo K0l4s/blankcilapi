@@ -144,10 +144,12 @@ public class UserServiceImpl implements IUserService {
             userEntity.setPhone(userModel.getPhone());
         }
         if (avatarImage != null) {
+            firebaseService.deleteFileFromFirebase(userEntity.getAvatar_url());
             String avatarUrl = firebaseService.uploadImageToFirebase(avatarImage, "avatar");
             userEntity.setAvatar_url(avatarUrl);
         }
         if (coverImage != null) {
+            firebaseService.deleteFileFromFirebase(userEntity.getCover_url());
             String coverUrl = firebaseService.uploadImageToFirebase(coverImage, "cover");
             userEntity.setCover_url(coverUrl);
         }
