@@ -2,6 +2,7 @@ package com.blankcil.api.blankcilapi.controller;
 
 import com.blankcil.api.blankcilapi.model.CommentModel;
 import com.blankcil.api.blankcilapi.model.ResponseModel;
+import com.blankcil.api.blankcilapi.model.SearchModel;
 import com.blankcil.api.blankcilapi.model.UserModel;
 import com.blankcil.api.blankcilapi.service.IUserService;
 import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -60,10 +62,12 @@ public class UserController {
 
     @PutMapping("/profile/edit")
     public ResponseEntity<ResponseModel> updateProfile(
-            @ModelAttribute UserModel userModel
+            @ModelAttribute UserModel userModel,
+            @RequestParam(value = "avatarImage", required = false) MultipartFile avatarImage,
+            @RequestParam(value = "coverImage", required = false) MultipartFile coverImage
     ) {
         try {
-            UserModel updatedUser = userService.updateUser(userModel);
+            UserModel updatedUser = userService.updateUser(userModel, avatarImage, coverImage);
             return ResponseEntity.ok().body(new ResponseModel(true, "Profile updated successfully", updatedUser));
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,13 +76,13 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ResponseModel> searchUsersByFullname(@RequestParam("name") String fullname) {
+    public ResponseEntity<ResponseModel> searchByKeyWords(@RequestParam("keyword") String keyword) {
         try {
-            List<UserModel> users = userService.findUsersByFullname(fullname);
-            if(users.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseModel(false, "User not found", null));
+            SearchModel searchModels = userService.findByKeywords(keyword);
+            if(searchModels.getPodcasts().isEmpty() && searchModels.getUsers().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseModel(false, "Not found", null));
             }
-            return ResponseEntity.ok().body(new ResponseModel(true, "Found", users));
+            return ResponseEntity.ok().body(new ResponseModel(true, "Found", searchModels));
         }
         catch (Exception e){
             e.printStackTrace();

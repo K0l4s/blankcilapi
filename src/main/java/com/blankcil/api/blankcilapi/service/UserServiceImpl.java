@@ -4,9 +4,7 @@ import com.blankcil.api.blankcilapi.entity.CommentEntity;
 import com.blankcil.api.blankcilapi.entity.PodcastEntity;
 import com.blankcil.api.blankcilapi.entity.PodcastLikeEntity;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
-import com.blankcil.api.blankcilapi.model.CommentModel;
-import com.blankcil.api.blankcilapi.model.ProfilePodcastModel;
-import com.blankcil.api.blankcilapi.model.UserModel;
+import com.blankcil.api.blankcilapi.model.*;
 import com.blankcil.api.blankcilapi.repository.CommentRepository;
 import com.blankcil.api.blankcilapi.repository.PodcastLikeRepository;
 import com.blankcil.api.blankcilapi.repository.PodcastRepository;
@@ -21,7 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,16 +32,25 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private ModelMapper modelMapper;
+
     @Autowired
     private PodcastRepository podcastRepository;
+
     @Autowired
     private PodcastLikeRepository podcastLikeRepository;
+
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private IFirebaseService firebaseService;
+
     @Override
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
 
@@ -112,12 +121,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserModel updateUser(UserModel userModel) {
+    public UserModel updateUser(UserModel userModel, MultipartFile avatarImage, MultipartFile coverImage) throws IOException {
         Principal connectedUser = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = connectedUser.getName();
 
         UserEntity userEntity = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+
+        firebaseService.createUserFolder(userEntity.getId().toString(), userEmail);
 
         // Cập nhật thông tin người dùng nếu có sự thay đổi
         if (userModel.getFullname() != null) {
@@ -132,6 +143,16 @@ public class UserServiceImpl implements IUserService {
         if (userModel.getPhone() != null) {
             userEntity.setPhone(userModel.getPhone());
         }
+        if (avatarImage != null) {
+            firebaseService.deleteFileFromFirebase(userEntity.getAvatar_url());
+            String avatarUrl = firebaseService.uploadImageToFirebase(avatarImage, "avatar");
+            userEntity.setAvatar_url(avatarUrl);
+        }
+        if (coverImage != null) {
+            firebaseService.deleteFileFromFirebase(userEntity.getCover_url());
+            String coverUrl = firebaseService.uploadImageToFirebase(coverImage, "cover");
+            userEntity.setCover_url(coverUrl);
+        }
 
         userRepository.save(userEntity);
 
@@ -140,11 +161,12 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public List<UserModel> findUsersByFullname(String fullname) {
-        List<UserEntity> userEntities = userRepository.findByFullnameIgnoreCaseContaining(fullname);
-        return userEntities.stream()
-                .map(userEntity -> modelMapper.map(userEntity,UserModel.class))
-                .toList();
+    public SearchModel findByKeywords(String keyword) {
+        List<UserEntity> userEntities = userRepository.findByFullnameIgnoreCaseContaining(keyword);
+        List<PodcastEntity> podcastEntities = podcastRepository.findByTitleIgnoreCaseContainingOrContentIgnoreCaseContaining(keyword, keyword);
+        List<UserModel> userModels = userEntities.stream().map(userEntity -> modelMapper.map(userEntity,UserModel.class)).toList();
+        List<PodcastModel> podcastModels = podcastEntities.stream().map(podcastEntity -> modelMapper.map(podcastEntity,PodcastModel.class)).toList();
+        return new SearchModel(userModels, podcastModels);
     }
 
     @Override

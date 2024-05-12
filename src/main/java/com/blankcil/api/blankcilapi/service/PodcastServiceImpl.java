@@ -3,15 +3,12 @@ package com.blankcil.api.blankcilapi.service;
 import com.blankcil.api.blankcilapi.entity.CommentEntity;
 import com.blankcil.api.blankcilapi.entity.PodcastEntity;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
-import com.blankcil.api.blankcilapi.model.CommentModel;
-import com.blankcil.api.blankcilapi.model.ParentCommentModel;
-import com.blankcil.api.blankcilapi.model.UserModel;
+import com.blankcil.api.blankcilapi.model.*;
 import com.blankcil.api.blankcilapi.repository.CommentRepository;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.blankcil.api.blankcilapi.utils.FFmpegUtil;
 import com.blankcil.api.blankcilapi.utils.ImageProcessing;
 import org.modelmapper.ModelMapper;
-import com.blankcil.api.blankcilapi.model.PodcastModel;
 import com.blankcil.api.blankcilapi.repository.PodcastRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -99,15 +96,21 @@ public class PodcastServiceImpl implements IPodcastService {
     }
 
     @Override
-    public List<PodcastModel> getPodcastsByPage(int pageNumber, int pageSize) {
+    public PageResponse<PodcastModel> getPodcastsByPage(int pageNumber, int pageSize) {
         // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
         int offset = pageNumber * pageSize;
+
+        // Lấy tổng số lượng podcast
+        long totalPodcasts = podcastRepository.count();
+
+        // Tính toán số lượng trang
+        int totalPage = (int) Math.ceil((double) totalPodcasts / pageSize) - 1;
 
         // Lấy danh sách podcast từ repository
         List<PodcastEntity> podcastEntities = podcastRepository.findPaginated(offset, pageSize);
 
         // Ánh xạ và trả về danh sách podcast model
-        return podcastEntities.stream()
+        List<PodcastModel> podcastModels = podcastEntities.stream()
                 .map(podcastEntity -> {
                     PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
                     podcastModel.setNumberOfComments(podcastEntity.getComments().size());
@@ -115,10 +118,11 @@ public class PodcastServiceImpl implements IPodcastService {
                     return podcastModel;
                 })
                 .collect(Collectors.toList());
+        return new PageResponse<>(podcastModels, pageNumber, totalPage);
     }
 
     @Override
-    public List<PodcastModel> getPodcastsByPageWithAuth(int pageNumber, int pageSize) throws IOException {
+    public PageResponse<PodcastModel> getPodcastsByPageWithAuth(int pageNumber, int pageSize) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         String userEmail = authentication.getName();
@@ -130,11 +134,17 @@ public class PodcastServiceImpl implements IPodcastService {
         // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
         int offset = pageNumber * pageSize;
 
+        // Lấy tổng số lượng podcast
+        long totalPodcasts = podcastRepository.count();
+
+        // Tính toán số lượng trang
+        int totalPage = (int) Math.ceil((double) totalPodcasts / pageSize) - 1;
+
         // Lấy danh sách podcast từ repository
         List<PodcastEntity> podcastEntities = podcastRepository.findPaginated(offset, pageSize);
 
         // Ánh xạ và trả về danh sách podcast model
-        return podcastEntities.stream()
+        List<PodcastModel> podcastModels =  podcastEntities.stream()
                 .map(podcastEntity -> {
                     PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
                     podcastModel.setNumberOfComments(podcastEntity.getComments().size());
@@ -148,18 +158,25 @@ public class PodcastServiceImpl implements IPodcastService {
                     return podcastModel;
                 })
                 .collect(Collectors.toList());
+        return new PageResponse<>(podcastModels, pageNumber, totalPage);
     }
 
     @Override
-    public List<PodcastModel> getPodcastTrending(int pageNumber, int pageSize) {
+    public PageResponse<PodcastModel> getPodcastTrending(int pageNumber, int pageSize) {
         // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
         int offset = pageNumber * pageSize;
+
+        // Lấy tổng số lượng podcast
+        long totalPodcasts = podcastRepository.count();
+
+        // Tính toán số lượng trang
+        int totalPage = (int) Math.ceil((double) totalPodcasts / pageSize) - 1;
 
         // Lấy danh sách podcast từ repository
         List<PodcastEntity> podcastEntities = podcastRepository.findPaginatedOrderByLikesDesc(offset, pageSize);
 
         // Ánh xạ và trả về danh sách podcast model
-        return podcastEntities.stream()
+        List<PodcastModel> podcastModels = podcastEntities.stream()
                 .map(podcastEntity -> {
                     PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
                     podcastModel.setNumberOfComments(podcastEntity.getComments().size());
@@ -167,10 +184,12 @@ public class PodcastServiceImpl implements IPodcastService {
                     return podcastModel;
                 })
                 .collect(Collectors.toList());
+
+        return new PageResponse<>(podcastModels, pageNumber, totalPage);
     }
 
     @Override
-    public List<PodcastModel> getPodcastTrendingWithAuth(int pageNumber, int pageSize) {
+    public PageResponse<PodcastModel> getPodcastTrendingWithAuth(int pageNumber, int pageSize) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         String userEmail = authentication.getName();
@@ -180,11 +199,17 @@ public class PodcastServiceImpl implements IPodcastService {
         // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
         int offset = pageNumber * pageSize;
 
+        // Lấy tổng số lượng podcast
+        long totalPodcasts = podcastRepository.count();
+
+        // Tính toán số lượng trang
+        int totalPage = (int) Math.ceil((double) totalPodcasts / pageSize) - 1;
+
         // Lấy danh sách podcast từ repository
         List<PodcastEntity> podcastEntities = podcastRepository.findPaginatedOrderByLikesDesc(offset, pageSize);
 
         // Ánh xạ và trả về danh sách podcast model
-        return podcastEntities.stream()
+        List<PodcastModel> podcastModels = podcastEntities.stream()
                 .map(podcastEntity -> {
                     PodcastModel podcastModel = modelMapper.map(podcastEntity, PodcastModel.class);
                     podcastModel.setNumberOfComments(podcastEntity.getComments().size());
@@ -198,5 +223,6 @@ public class PodcastServiceImpl implements IPodcastService {
                     return podcastModel;
                 })
                 .collect(Collectors.toList());
+        return new PageResponse<>(podcastModels, pageNumber, totalPage);
     }
 }

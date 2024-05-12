@@ -62,6 +62,7 @@ public class FirebaseServiceImpl implements IFirebaseService {
 
     @Override
     public String uploadImageToFirebase(MultipartFile imageFile, String type) throws IOException {
+        System.out.println(imageFile);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
 
@@ -72,15 +73,35 @@ public class FirebaseServiceImpl implements IFirebaseService {
 
         Storage storage = firebaseStorage;
 
-        // Generate unique image name
-        String imageName = UUID.randomUUID() + ".jpg";
+        // Get file extension
+        String originalFilename = imageFile.getOriginalFilename();
+        assert originalFilename != null;
+        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.') + 1);
 
-        String folderName = switch (type) {
-            case "thumbnail" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + PODCAST_FOLDER + THUMBNAIL_FOLDER;
-            case "avatar" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + AVATAR_FOLDER;
-            case "cover" -> MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + COVER_FOLDER;
-            default -> null;
-        };
+        // Generate unique image name with original file extension
+//        String imageName = UUID.randomUUID() + "." + fileExtension;
+
+        String imageName;
+        String folderName;
+
+        switch (type) {
+            case "thumbnail":
+                imageName = UUID.randomUUID() + "." + fileExtension;
+                folderName = MAIN_FOLDER + userId + "-" + userEmail + "/" + PODCAST_FOLDER + THUMBNAIL_FOLDER;
+                break;
+            case "avatar":
+                imageName = "avatar_image" + "." + fileExtension;
+                folderName = MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + AVATAR_FOLDER;
+                break;
+            case "cover":
+                imageName = "cover_image" + "." + fileExtension;
+                folderName = MAIN_FOLDER + userId + "-" + userEmail + "/" + INFO_FOLDER + COVER_FOLDER;
+                break;
+            default:
+                imageName = null;
+                folderName = null;
+                break;
+        }
 
         // Upload image to bucket
         BlobId blobId = BlobId.of(bucketName, folderName + imageName);
@@ -144,21 +165,9 @@ public class FirebaseServiceImpl implements IFirebaseService {
             // Tạo thư mục Info/cover
             createFolder(storage, folderName + INFO_FOLDER, COVER_FOLDER);
         }
-//        String folderName = "main/" + userId + "-" + userName + "/";
-//        BlobId folderBlobId = BlobId.of(bucketName, folderName);
-//        Storage storage = firebaseStorage;
-//        // Kiểm tra xem thư mục đã tồn tại chưa
-//        if (!isFolderExists(storage, folderBlobId)) {
-//            // Nếu chưa tồn tại, tạo mới thư mục
-//            BlobInfo blobInfo = BlobInfo.newBuilder(folderBlobId).build();
-//            storage.create(blobInfo);
-//        }
+
     }
 
-//    private boolean isFolderExists(Storage storage, BlobId blobId) {
-//        Blob blob = storage.get(blobId);
-//        return blob != null && blob.exists();
-//    }
 
     // Hàm kiểm tra xem thư mục đã tồn tại hay chưa
     private boolean isFolderExists(Storage storage, String folderName) {
@@ -174,4 +183,15 @@ public class FirebaseServiceImpl implements IFirebaseService {
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/x-directory").build();
         storage.create(blobInfo);
     }
+
+    @Override
+    public void deleteFileFromFirebase(String filePath) {
+        if (filePath == null) {
+            return;
+        }
+        Storage storage = firebaseStorage;
+        BlobId blobId = BlobId.of(bucketName, filePath);
+        storage.delete(blobId);
+    }
+
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface PodcastRepository extends JpaRepository<PodcastEntity, Integer> {
-    @Query(value = "SELECT * FROM Podcast LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    @Query(value = "SELECT * FROM Podcast ORDER BY create_day DESC LIMIT :pageSize OFFSET :offset", nativeQuery = true)
     List<PodcastEntity> findPaginated(@Param("offset") int offset, @Param("pageSize") int pageSize);
 
     @Query(value = "SELECT p.*, COUNT(pl.id) AS like_count " +
@@ -21,4 +21,5 @@ public interface PodcastRepository extends JpaRepository<PodcastEntity, Integer>
             "LIMIT :pageSize OFFSET :offset",
             nativeQuery = true)
     List<PodcastEntity> findPaginatedOrderByLikesDesc(@Param("offset") int offset, @Param("pageSize") int pageSize);
+    List<PodcastEntity> findByTitleIgnoreCaseContainingOrContentIgnoreCaseContaining(String title, String content);
 }
