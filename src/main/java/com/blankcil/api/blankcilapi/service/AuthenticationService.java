@@ -32,6 +32,8 @@ public class AuthenticationService {
   private final AuthenticationManager authenticationManager;
 
   public AuthenticationResponse register(RegisterRequest request) {
+    if(repository.existsUserEntityByEmail(request.getEmail()))
+      throw new RuntimeException("User with email " + request.getEmail() + " already exists.");
     var user = UserEntity.builder()
             .fullname(request.getFullname())
             .email(request.getEmail())
@@ -41,6 +43,8 @@ public class AuthenticationService {
             .phone(request.getPhone())
             .birthday(request.getBirthday())
             .createDay(LocalDateTime.now())
+            .avatar_url(null)
+            .cover_url(null)
             .code(null)
         .build();
     var savedUser = repository.save(user);
