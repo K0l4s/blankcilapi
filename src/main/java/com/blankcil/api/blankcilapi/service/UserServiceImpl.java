@@ -1,14 +1,8 @@
 package com.blankcil.api.blankcilapi.service;
 
-import com.blankcil.api.blankcilapi.entity.CommentEntity;
-import com.blankcil.api.blankcilapi.entity.PodcastEntity;
-import com.blankcil.api.blankcilapi.entity.PodcastLikeEntity;
-import com.blankcil.api.blankcilapi.entity.UserEntity;
+import com.blankcil.api.blankcilapi.entity.*;
 import com.blankcil.api.blankcilapi.model.*;
-import com.blankcil.api.blankcilapi.repository.CommentRepository;
-import com.blankcil.api.blankcilapi.repository.PodcastLikeRepository;
-import com.blankcil.api.blankcilapi.repository.PodcastRepository;
-import com.blankcil.api.blankcilapi.repository.UserRepository;
+import com.blankcil.api.blankcilapi.repository.*;
 import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -50,6 +44,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private IFirebaseService firebaseService;
+
+    @Autowired
+    private CommentLikeRepository commentLikeRepository;
 
     @Override
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
@@ -254,6 +251,38 @@ public class UserServiceImpl implements IUserService {
                 .build();
         commentRepository.save(replyComment);
         return modelMapper.map(replyComment, CommentModel.class);
+    }
+
+    @Override
+    public String likeComment(long commentId) {
+        Authentication authentication = SecurityContextHoslder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
+        // Kiểm tra xem user đã like comment này chưa ?
+        CommentLikeEntity existingCommentLike = findExistingCommentLike(user, comment);
+        // Nếu comment đã tồn tại (đã được user like trước đó) thì xóa like đó đi
+        if (existingCommentLike != null) {
+            commentLikeRepository.delete(existingCommentLike);
+            return "Unliked";
+        } else {
+            CommentLikeEntity like = CommentLikeEntity.builder()
+                    .timestamp(LocalDateTime.now())
+                    .user_comment_like(user).comment_like(comment)
+                    .build();
+            commentLikeRepository.save(like);
+            return "Liked";
+        }
+    }
+
+    private CommentLikeEntity findExistingCommentLike(UserEntity user, CommentEntity comment) {
+        // Tìm like của user cho podcast này
+        for (CommentLikeEntity like : user.getComment_likes()) {
+            if (like.getComment_like().equals(comment)) {
+                return like;
+            }
+        }
+        return null;
     }
 
 }

@@ -124,4 +124,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed!!", null));
         }
     }
+
+    @PostMapping("/like/comment/{id}")
+    public ResponseEntity<ResponseModel> likeComment(@PathVariable("id") int id) {
+        try {
+            String msg = userService.likeComment(id);
+            return ResponseEntity.ok().body(new ResponseModel(true, msg, null));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
+        }
+    }
 }

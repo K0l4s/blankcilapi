@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FFmpegUtil {
     public static File VIDEO_FILE = null;
-    public synchronized static byte[] combineMultipartFiles(MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException {
+    public static byte[] combineMultipartFiles(MultipartFile imageFile, MultipartFile audioFile) throws IOException, InterruptedException {
         // Lấy đường dẫn tương đối đến thư mục temp mặc định
         String tempDirPath = System.getProperty("java.io.tmpdir");
         File tempDirectory = new File(tempDirPath);

@@ -19,4 +19,5 @@ public interface IUserService {
     String likePodcast(int podcastId);
     CommentModel commentOnPodcast(String content, int podcastId);
     CommentModel replyComment(String content, long parentCommentId);
+    String likeComment(long commentId);
 }
