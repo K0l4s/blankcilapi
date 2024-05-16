@@ -255,7 +255,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public String likeComment(long commentId) {
-        Authentication authentication = SecurityContextHoslder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
         UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));

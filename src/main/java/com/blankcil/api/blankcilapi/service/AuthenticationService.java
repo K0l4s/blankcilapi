@@ -1,8 +1,6 @@
 package com.blankcil.api.blankcilapi.service;
 
-import com.blankcil.api.blankcilapi.model.AuthenticationRequest;
-import com.blankcil.api.blankcilapi.model.AuthenticationResponse;
-import com.blankcil.api.blankcilapi.model.RegisterRequest;
+import com.blankcil.api.blankcilapi.model.*;
 import com.blankcil.api.blankcilapi.config.JwtService;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
 import com.blankcil.api.blankcilapi.entity.TokenEntity;
@@ -13,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +31,18 @@ public class AuthenticationService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
 
-  public AuthenticationResponse register(RegisterRequest request) {
+  @Autowired
+  private IEmailService emailService = new EmailServiceImpl();
+  public RegisterResponse register(RegisterRequest request) {
     if(repository.existsUserEntityByEmail(request.getEmail()))
       throw new RuntimeException("User with email " + request.getEmail() + " already exists.");
+
+//    Gửi code
+    String code = this.getRandom();
+//    account.setCode(code);
+    String body = "Mã xác nhận Mạng xã hội Podcast Blankcil của bạn là: "+code+" ! Nếu bạn không đăng ký" +
+            "\n Blankcil thì hãy bỏ qua email này!";
+    emailService.sendEmail("Blankcil Team",request.getEmail(),"Confirm email",body);
     var user = UserEntity.builder()
             .fullname(request.getFullname())
             .email(request.getEmail())
@@ -45,18 +54,42 @@ public class AuthenticationService {
             .createDay(LocalDateTime.now())
             .avatar_url(null)
             .cover_url(null)
-            .code(null)
+            .code(code)
+            .isActive(false)
         .build();
+
     var savedUser = repository.save(user);
-    var jwtToken = jwtService.generateToken(user);
-    var refreshToken = jwtService.generateRefreshToken(user);
+    return RegisterResponse.builder()
+            .fullname(savedUser.getFullname())
+            .email(savedUser.getEmail())
+            .build();
+//    var jwtToken = jwtService.generateToken(user);
+//    var refreshToken = jwtService.generateRefreshToken(user);
+//    saveUserToken(savedUser, jwtToken);
+//    return AuthenticationResponse.builder()
+//        .accessToken(jwtToken)
+//            .refreshToken(refreshToken)
+//        .build();
+  }
+  public AuthenticationResponse confirmRegister(ConfirmRequest confirmRequest) throws Exception{
+    if ("ĐÃ XÁC THỰC".equals(confirmRequest.getCode())) {
+      throw new Exception("Lỗi bảo mật!");
+    }
+//    UserEntity user = repository.findUserByEmail(email);
+    var user = repository.findByEmailAndCode(confirmRequest.getEmail(),confirmRequest.getCode()).orElseThrow();
+
+    user.setActive(true);
+    user.setCode("ĐÃ XÁC THỰC");
+    var savedUser = repository.save(user);
+
+    var jwtToken = jwtService.generateToken(savedUser);
+    var refreshToken = jwtService.generateRefreshToken(savedUser);
     saveUserToken(savedUser, jwtToken);
     return AuthenticationResponse.builder()
-        .accessToken(jwtToken)
+            .accessToken(jwtToken)
             .refreshToken(refreshToken)
-        .build();
+            .build();
   }
-
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
@@ -124,5 +157,10 @@ public class AuthenticationService {
         new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
       }
     }
+  }
+  public String getRandom() {
+    Random rnd = new Random();
+    int number = rnd.nextInt(999999);
+    return String.format("%06d", number);
   }
 }
