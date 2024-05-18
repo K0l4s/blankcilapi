@@ -21,12 +21,12 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     @Query("SELECT COUNT(c) FROM CommentEntity c WHERE c.parentComment.id = :parentId")
     long countRepliesByParentCommentId(long parentId);
 
-    @Query("SELECT c, COUNT(cl) AS totalLikes " +
+    @Query("SELECT c, COUNT(DISTINCT cl.id) AS totalLikes, COUNT(DISTINCT r.id) AS totalReplies " +
             "FROM CommentEntity c " +
             "LEFT JOIN c.comment_likes cl " +
             "LEFT JOIN c.replies r " +
-            "WHERE c.podcast_comment.id = :podcastId AND c.parentComment IS NULL " + // Chỉ sắp xếp các bình luận gốc
-            "GROUP BY c " +
+            "WHERE c.podcast_comment.id = :podcastId AND c.parentComment IS NULL " +
+            "GROUP BY c.id " +
             "ORDER BY c.timestamp DESC")
     Page<Object[]> getCommentsWithTotalLikesAndTotalRepliesForPodcast(Long podcastId, Pageable pageable);
 }
