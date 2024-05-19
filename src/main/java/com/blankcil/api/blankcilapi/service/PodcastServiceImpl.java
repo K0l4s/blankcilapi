@@ -96,6 +96,27 @@ public class PodcastServiceImpl implements IPodcastService {
     }
 
     @Override
+    public PodcastModel getPodcastWithAuth(int id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String userEmail = authentication.getName();
+        UserEntity userEntity = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+
+        Optional<PodcastEntity> podcastEntity = podcastRepository.findById(id);
+        if (podcastEntity.isPresent()) {
+            PodcastModel podcastModel = modelMapper.map(podcastEntity.get(), PodcastModel.class);
+            podcastModel.setNumberOfLikes(podcastEntity.get().getPodcast_likes().size());
+            podcastModel.setNumberOfComments(podcastEntity.get().getComments().size());
+            boolean hasLiked = podcastEntity.get().getPodcast_likes().stream()
+                    .anyMatch(podcastLikeEntity -> podcastLikeEntity.getUser_podcast_like().equals(userEntity));
+            podcastModel.setHasLiked(hasLiked);
+            return podcastModel;
+        }
+        return null;
+    }
+
+    @Override
     public PageResponse<PodcastModel> getPodcastsByPage(int pageNumber, int pageSize) {
         // Tính toán offset để lấy dữ liệu từ vị trí bắt đầu
         int offset = pageNumber * pageSize;

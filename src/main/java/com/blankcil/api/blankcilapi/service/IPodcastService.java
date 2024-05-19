@@ -12,6 +12,7 @@ public interface IPodcastService {
     PodcastModel createPodcast(PodcastModel podcastModel, MultipartFile imageFile, MultipartFile audioFile) throws Exception;
     List<PodcastModel> getAllPodcasts();
     PodcastModel getPodcast(int id);
+    PodcastModel getPodcastWithAuth(int id);
     PageResponse<PodcastModel> getPodcastsByPage(int pageNumber, int pageSize);
     PageResponse<PodcastModel> getPodcastsByPageWithAuth(int pageNumber, int pageSize) throws IOException;
 

@@ -59,6 +59,18 @@ public class PodcastController {
         }
     }
 
+    @GetMapping("auth/view/{id}")
+    public ResponseEntity<ResponseModel> getPodcastWithAuth(@PathVariable int id) {
+        try {
+            PodcastModel podcasts = podcastService.getPodcastWithAuth(id);
+            return ResponseEntity.ok(new ResponseModel(true, "Get successfully", podcasts));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed", null));
+        }
+    }
+
     @GetMapping("/view/page")
     public ResponseEntity<ResponseModel> getPodcastsByPage(
             @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
@@ -104,6 +116,19 @@ public class PodcastController {
                                                                @PageableDefault(size = 10, page = 0) Pageable pageable) {
         try {
             Page<CommentModel> commentPage = commentService.getCommentsForPodcast(id, pageable);
+            return ResponseEntity.ok(new ResponseModel(true, "Get comments successfully", commentPage.getContent()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseModel(false, "Failed to get comments", null));
+        }
+    }
+
+    @GetMapping("/auth/view/{id}/comments")
+    public ResponseEntity<ResponseModel> getCommentsForPodcastWithAuth(@PathVariable int id,
+                                                               @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        try {
+            Page<CommentModel> commentPage = commentService.getCommentsForPodcastWithAuth(id, pageable);
             return ResponseEntity.ok(new ResponseModel(true, "Get comments successfully", commentPage.getContent()));
         } catch (Exception e) {
             e.printStackTrace();

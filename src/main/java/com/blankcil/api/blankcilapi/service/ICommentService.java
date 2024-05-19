@@ -10,5 +10,6 @@ import java.util.List;
 public interface ICommentService {
 //    List<CommentModel> getCommentsForPodcast(int podcastId);
     Page<CommentModel> getCommentsForPodcast(int podcastId, Pageable pageable);
+    Page<CommentModel> getCommentsForPodcastWithAuth(int podcastId, Pageable pageable);
     List<ReplyCommentModel> getReplies(long commentId);
 }
