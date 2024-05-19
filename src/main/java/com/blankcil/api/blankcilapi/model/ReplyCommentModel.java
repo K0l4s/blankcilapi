@@ -16,6 +16,7 @@ public class ReplyCommentModel implements Serializable {
     private String content;
     private LocalDateTime timestamp;
     private UserCommentModel user_comment;
+    boolean hasLiked;
     private int totalLikes;
     private int totalReplies;
     private List<ReplyCommentModel> replies;
