@@ -26,6 +26,7 @@ Blankcil is created and developed by a student team from Ho Chi Minh City Univer
 | 4   | NGUYỄN THẾ THÀNH         | 21110300        | [thanhnt932](https://github.com/thanhnt932)      | Stopped      |
 
 Initially, the project was developed by four contributors and submitted for the 'Object-Oriented Software Technology' subject. However, the team split into two groups. The project is now being developed by HUỲNH TRUNG KIÊN and NGÔ MINH THUẬN and will be submitted for the 'Graduation Thesis Project'.
+## [Task Assignment Table ](https://app.clickup.com/9018333656/v/l/li/901802044699)
 ## Product Features <a name="productfeatures"></a>
 ### 1. Security <a name="authen"></a>
 With authentication and authorization, we use Spring Security to protect the project with JWT Token. To verify real users, we utilize email to send a pin number. Users are required to input this pin, obtained from the email, into the Verification Page in order to use our website.
