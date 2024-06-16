@@ -22,5 +22,9 @@ public class UserModel implements Serializable {
     private LocalDate birthday;
     private String address;
     private String phone;
+    private String nickName;
+    private boolean isFollow = false;
+    private int followers;
+    private int following;
     private List<ProfilePodcastModel> podcasts;
 }

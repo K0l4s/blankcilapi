@@ -15,5 +15,6 @@ public class ProfilePodcastModel implements Serializable {
     private String audio_url;
     private String title;
     private String content;
+    private String nickName;
     private int numberOfLikes;
 }

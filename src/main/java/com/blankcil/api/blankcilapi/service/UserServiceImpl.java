@@ -4,10 +4,8 @@ import com.blankcil.api.blankcilapi.entity.*;
 import com.blankcil.api.blankcilapi.model.*;
 import com.blankcil.api.blankcilapi.repository.*;
 import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,6 +45,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private CommentLikeRepository commentLikeRepository;
+
+    @Autowired
+    private FollowRepository followRepository;
 
     @Override
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
@@ -93,12 +94,11 @@ public class UserServiceImpl implements IUserService {
 
         return userModel;
     }
-
     @Override
-    public UserModel getProfileOther(int id) {
+    public UserModel getProfileOtherByNickname(String nickname) {
 
-        UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        UserEntity userEntity = userRepository.findUserEntityByNickName(nickname)
+                .orElseThrow(() -> new RuntimeException("User not found with Nickname: " + nickname));
 
         // Lấy danh sách podcast của user
         List<ProfilePodcastModel> profilePodcasts = new ArrayList<>();
@@ -113,6 +113,19 @@ public class UserServiceImpl implements IUserService {
         // Tạo UserModel và set danh sách podcasts
         UserModel userModel = modelMapper.map(userEntity, UserModel.class);
         userModel.setPodcasts(profilePodcasts);
+        userModel.setFollowers(followRepository.countByTargetId(userEntity.getId()));
+        userModel.setFollowing(followRepository.countByFollowerId(userEntity.getId()));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.isAuthenticated()) {
+
+            String userEmail = authentication.getName();
+            if(!userEmail.equals("anonymousUser")){
+            UserEntity user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));;
+            if(followRepository.existsByFollowerIdAndTargetId(user.getId(), userEntity.getId())) {
+                userModel.setFollow(true);
+            }
+        }
 
         return userModel;
     }
@@ -163,6 +176,19 @@ public class UserServiceImpl implements IUserService {
         List<PodcastEntity> podcastEntities = podcastRepository.findByTitleIgnoreCaseContainingOrContentIgnoreCaseContaining(keyword, keyword);
         List<UserModel> userModels = userEntities.stream().map(userEntity -> modelMapper.map(userEntity,UserModel.class)).toList();
         List<PodcastModel> podcastModels = podcastEntities.stream().map(podcastEntity -> modelMapper.map(podcastEntity,PodcastModel.class)).toList();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated())
+        {
+            String userEmail = authentication.getName();
+            UserEntity user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            for(UserModel targetUser : userModels) {
+                if(followRepository.existsByFollowerIdAndTargetId(user.getId(), targetUser.getId()))
+                    targetUser.setFollow(true);
+            }
+        }
         return new SearchModel(userModels, podcastModels);
     }
 

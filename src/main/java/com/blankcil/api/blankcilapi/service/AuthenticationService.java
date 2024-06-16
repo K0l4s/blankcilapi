@@ -4,6 +4,10 @@ import com.blankcil.api.blankcilapi.model.*;
 import com.blankcil.api.blankcilapi.config.JwtService;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
 import com.blankcil.api.blankcilapi.entity.TokenEntity;
+import com.blankcil.api.blankcilapi.model.request.AuthenticationRequest;
+import com.blankcil.api.blankcilapi.model.request.RegisterRequest;
+import com.blankcil.api.blankcilapi.model.response.AuthenticationResponse;
+import com.blankcil.api.blankcilapi.model.response.RegisterResponse;
 import com.blankcil.api.blankcilapi.repository.TokenRepository;
 import com.blankcil.api.blankcilapi.token.TokenType;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
@@ -33,16 +37,19 @@ public class AuthenticationService {
 
   @Autowired
   private IEmailService emailService = new EmailServiceImpl();
+  @Autowired
+  private UserRepository userRepository;
   public RegisterResponse register(RegisterRequest request) {
-    if(repository.existsUserEntityByEmail(request.getEmail()))
-      throw new RuntimeException("User with email " + request.getEmail() + " already exists.");
+    if(repository.existsUserEntityByEmailOrNickName(request.getEmail(),request.getNickName()))
+      throw new RuntimeException("User with email " + request.getEmail() +" or nick name "+request.getNickName()+ " already exists.");
 
 //    Gửi code
-    String code = this.getRandom();
+//    String code = this.getRandom();
 //    account.setCode(code);
-    String body = "Mã xác nhận Mạng xã hội Podcast Blankcil của bạn là: "+code+" ! Nếu bạn không đăng ký" +
-            "\n Blankcil thì hãy bỏ qua email này!";
-    emailService.sendEmail("Blankcil Team",request.getEmail(),"Confirm email",body);
+//    String body = "Mã xác nhận Mạng xã hội Podcast Blankcil của bạn là: "+code+" ! Nếu bạn không đăng ký" +
+//            "\n Blankcil thì hãy bỏ qua email này!";
+//    emailService.sendEmail("Blankcil Team",request.getEmail(),"Confirm email",body);
+    String code = sendCode(request.getEmail());
     var user = UserEntity.builder()
             .fullname(request.getFullname())
             .email(request.getEmail())
@@ -56,6 +63,7 @@ public class AuthenticationService {
             .cover_url(null)
             .code(code)
             .isActive(false)
+            .nickName(request.getNickName())
         .build();
 
     var savedUser = repository.save(user);
@@ -70,6 +78,25 @@ public class AuthenticationService {
 //        .accessToken(jwtToken)
 //            .refreshToken(refreshToken)
 //        .build();
+  }
+  private String sendCode(String email){
+    String code = this.getRandom();
+//    account.setCode(code);
+    String body = "Mã xác nhận Mạng xã hội Podcast Blankcil của bạn là: "+code+" ! Nếu bạn không đăng ký" +
+            "\n Blankcil thì hãy bỏ qua email này!";
+    emailService.sendEmail("Blankcil Team",email,"Confirm email",body);
+    return code;
+  }
+
+  public String sendCodeToUser(String email){
+
+    var user = userRepository.findByEmail(email)
+            .orElseThrow();
+    String code = sendCode(user.getEmail());
+    user.setCode(code);
+    UserEntity savedUser = userRepository.save(user);
+    return savedUser.getEmail();
+//    return new ConfirmRequest().builder().email(savedUser.getEmail()).code(savedUser.getCode()).build();
   }
   public AuthenticationResponse confirmRegister(ConfirmRequest confirmRequest) throws Exception{
     if ("ĐÃ XÁC THỰC".equals(confirmRequest.getCode())) {
