@@ -177,6 +177,13 @@ public class ChatServiceImpl implements IChatService {
         MessageEntity savedMessageEntity = messageRepository.save(messageEntity);
         return modelMapper.map(savedMessageEntity,MessageModel.class);
     }
+    @Override
+    public MessageModel findMessageById(int id) {
+        MessageEntity messageEntity = messageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found with id: " + id));
+
+        return modelMapper.map(messageEntity, MessageModel.class);
+    }
 
 
 }

@@ -5,6 +5,7 @@ import com.blankcil.api.blankcilapi.model.MessageModel;
 import com.blankcil.api.blankcilapi.model.request.ChatRenameRequestModel;
 import com.blankcil.api.blankcilapi.model.request.SendMessageModal;
 import com.blankcil.api.blankcilapi.model.response.ChatResponse;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface IChatService {
     List<MessageModel> findMessageByChatId(int chatId);
 
     MessageModel sendMessage(SendMessageModal sendMessageModal);
+
+    MessageModel findMessageById(int id);
 }
