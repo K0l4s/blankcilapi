@@ -11,6 +11,7 @@ import com.blankcil.api.blankcilapi.model.response.RegisterResponse;
 import com.blankcil.api.blankcilapi.repository.TokenRepository;
 import com.blankcil.api.blankcilapi.token.TokenType;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
+import com.blankcil.api.blankcilapi.user.Role;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,7 +55,7 @@ public class AuthenticationService {
             .fullname(request.getFullname())
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
-            .role(request.getRole())
+            .role(Role.USER)
             .address(request.getAddress())
             .phone(request.getPhone())
             .birthday(request.getBirthday())
@@ -64,7 +65,7 @@ public class AuthenticationService {
             .code(code)
             .isActive(false)
             .nickName(request.getNickName())
-        .build();
+            .isLock(false).build();
 
     var savedUser = repository.save(user);
     return RegisterResponse.builder()

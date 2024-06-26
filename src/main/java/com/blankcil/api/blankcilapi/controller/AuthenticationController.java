@@ -26,7 +26,6 @@ public class AuthenticationController {
   public ResponseEntity<RegisterResponse> register(
           @RequestBody RegisterRequest request
   ) {
-    request.setRole(Role.USER);
     return ResponseEntity.ok(service.register(request));
   }
   @PostMapping("/confirm-email")

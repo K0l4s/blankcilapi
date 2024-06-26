@@ -73,8 +73,6 @@ public class UserController {
     }
 
 
-
-
     @PutMapping("/profile/edit")
     public ResponseEntity<ResponseModel> updateProfile(
             @ModelAttribute UserModel userModel,
@@ -158,4 +156,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
         }
     }
+
 }
