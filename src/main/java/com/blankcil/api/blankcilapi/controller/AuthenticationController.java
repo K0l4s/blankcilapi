@@ -2,6 +2,7 @@ package com.blankcil.api.blankcilapi.controller;
 
 import com.blankcil.api.blankcilapi.model.*;
 import com.blankcil.api.blankcilapi.model.request.AuthenticationRequest;
+import com.blankcil.api.blankcilapi.model.request.GoogleLoginRequest;
 import com.blankcil.api.blankcilapi.model.request.RegisterRequest;
 import com.blankcil.api.blankcilapi.model.response.AuthenticationResponse;
 import com.blankcil.api.blankcilapi.model.response.RegisterResponse;
@@ -28,15 +29,22 @@ public class AuthenticationController {
   ) {
     return ResponseEntity.ok(service.register(request));
   }
+
   @PostMapping("/confirm-email")
   public ResponseEntity<AuthenticationResponse> confirm(@RequestBody ConfirmRequest confirmRequest) throws Exception {
     return ResponseEntity.ok(service.confirmRegister(confirmRequest));
   }
+
   @PostMapping("/authenticate")
   public ResponseEntity<AuthenticationResponse> authenticate(
       @RequestBody AuthenticationRequest request
   ) {
     return ResponseEntity.ok(service.authenticate(request));
+  }
+
+  @PostMapping("/oauth2/login")
+  public ResponseEntity<AuthenticationResponse> loginWithGoogleOauth2(@RequestBody GoogleLoginRequest requestBody) {
+    return ResponseEntity.ok(service.loginOAuthGoogle(requestBody));
   }
 
   @PostMapping("/refresh-token")
@@ -46,11 +54,11 @@ public class AuthenticationController {
   ) throws IOException {
     service.refreshToken(request, response);
   }
-  @PatchMapping("/code/{email}")
-  public ResponseEntity<String> sendCode(
-          @PathVariable("email") String email
-  ){
-    return ResponseEntity.ok(service.sendCodeToUser(email));
-  }
+//  @PatchMapping("/code/{email}")
+//  public ResponseEntity<String> sendCode(
+//          @PathVariable("email") String email
+//  ){
+//    return ResponseEntity.ok(service.sendCodeToUser(email));
+//  }
 
 }
