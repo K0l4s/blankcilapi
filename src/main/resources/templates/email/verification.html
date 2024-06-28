@@ -47,6 +47,14 @@
         .verify-button:hover {
             background-color: #40b766;
         }
+        .verification-code {
+            font-size: 18px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -66,7 +74,12 @@
                 </tr>
                 <tr>
                     <td align="center">
-                        <p>Please click the button below to verify your registration:</p>
+                        <p>Please use the code or click the button below to verify your registration:</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <p class="verification-code" th:text="${verificationCode}">N/A</p>
                     </td>
                 </tr>
                 <tr>

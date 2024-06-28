@@ -13,6 +13,7 @@ import com.blankcil.api.blankcilapi.repository.TokenRepository;
 import com.blankcil.api.blankcilapi.token.TokenType;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.blankcil.api.blankcilapi.user.Role;
+import com.blankcil.api.blankcilapi.utils.EncryptionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -50,8 +51,8 @@ public class AuthenticationService {
   @Autowired
   private GoogleIdTokenVerifier verifier;
 
-  public RegisterResponse register(RegisterRequest request) {
-    if(repository.existsUserEntityByEmailOrNickName(request.getEmail(),request.getNickName()))
+  public RegisterResponse register(RegisterRequest request) throws Exception {
+    if(userRepository.existsUserEntityByEmail(request.getEmail()))
       throw new RuntimeException("User with email " + request.getEmail() +" or nick name "+request.getNickName()+ " already exists.");
 
     String code = this.getRandom();
@@ -72,7 +73,10 @@ public class AuthenticationService {
             .nickName(request.getNickName())
             .isLock(false).build();
 
+    // Send verification email with encrypted code
+//    String encryptedCode = EncryptionUtils.encrypt(user.getCode());
     emailService.sendVerificationMail(user.getEmail(), user.getCode());
+
     var savedUser = repository.save(user);
 
     return RegisterResponse.builder()
@@ -104,8 +108,9 @@ public class AuthenticationService {
     if ("ĐÃ XÁC THỰC".equals(confirmRequest.getCode())) {
       throw new Exception("Lỗi bảo mật!");
     }
-//    UserEntity user = repository.findUserByEmail(email);
-    var user = repository.findByEmailAndCode(confirmRequest.getEmail(),confirmRequest.getCode()).orElseThrow();
+
+//    String decryptedCode = EncryptionUtils.decrypt(confirmRequest.getCode());
+    var user = repository.findByEmailAndCode(confirmRequest.getEmail(), confirmRequest.getCode()).orElseThrow();
 
     user.setActive(true);
     user.setCode("ĐÃ XÁC THỰC");

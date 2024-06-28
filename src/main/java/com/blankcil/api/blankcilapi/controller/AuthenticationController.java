@@ -26,7 +26,7 @@ public class AuthenticationController {
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(
           @RequestBody RegisterRequest request
-  ) {
+  ) throws Exception {
     return ResponseEntity.ok(service.register(request));
   }
 
@@ -54,11 +54,11 @@ public class AuthenticationController {
   ) throws IOException {
     service.refreshToken(request, response);
   }
+
 //  @PatchMapping("/code/{email}")
 //  public ResponseEntity<String> sendCode(
 //          @PathVariable("email") String email
 //  ){
 //    return ResponseEntity.ok(service.sendCodeToUser(email));
 //  }
-
 }

@@ -53,6 +53,7 @@ public class EmailServiceImpl implements IEmailService{
 
         Context context = new Context();
         context.setVariable("verificationUrl", verificationUrl);
+        context.setVariable("verificationCode", code);
 
         String htmlContent = templateEngine.process("email/verification", context);
 
