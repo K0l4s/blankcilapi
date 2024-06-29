@@ -1,5 +1,6 @@
 package com.blankcil.api.blankcilapi.service;
 
 public interface IEmailService {
-    boolean sendEmail(String from, String to, String subject, String body);
+    void sendVerificationMail(String email, String code);
+    void sendWelcomeMessage(String email, String fullName);
 }

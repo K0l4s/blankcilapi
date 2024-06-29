@@ -57,6 +57,10 @@ public class UserEntity implements UserDetails {
   @OneToMany(mappedBy = "user_podcast_like")
   public List<PodcastLikeEntity> podcast_likes;
 
+  public UserEntity(String email, String fullname) {
+    this.email = email;
+    this.fullname = fullname;
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
