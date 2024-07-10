@@ -1,10 +1,9 @@
 package com.blankcil.api.blankcilapi.service;
 
-import com.blankcil.api.blankcilapi.entity.CommentEntity;
 import com.blankcil.api.blankcilapi.entity.PodcastEntity;
 import com.blankcil.api.blankcilapi.entity.UserEntity;
 import com.blankcil.api.blankcilapi.model.*;
-import com.blankcil.api.blankcilapi.repository.CommentRepository;
+import com.blankcil.api.blankcilapi.model.response.PageResponse;
 import com.blankcil.api.blankcilapi.repository.UserRepository;
 import com.blankcil.api.blankcilapi.utils.FFmpegUtil;
 import com.blankcil.api.blankcilapi.utils.ImageProcessing;
@@ -16,11 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

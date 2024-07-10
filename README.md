@@ -26,13 +26,17 @@ Blankcil is created and developed by a student team from Ho Chi Minh City Univer
 | 4   | NGUYỄN THẾ THÀNH         | 21110300        | [thanhnt932](https://github.com/thanhnt932)      | Stopped      |
 
 Initially, the project was developed by four contributors and submitted for the 'Object-Oriented Software Technology' subject. However, the team split into two groups. The project is now being developed by HUỲNH TRUNG KIÊN and NGÔ MINH THUẬN and will be submitted for the 'Graduation Thesis Project'.
+## [Task Assignment Table ](https://app.clickup.com/9018333656/v/l/li/901802044699)
 ## Product Features <a name="productfeatures"></a>
 ### 1. Security <a name="authen"></a>
 With authentication and authorization, we use Spring Security to protect the project with JWT Token. To verify real users, we utilize email to send a pin number. Users are required to input this pin, obtained from the email, into the Verification Page in order to use our website.
 #### 1.1. Spring Security <a name="springsecu"></a>
 ![Spring Security Explain](https://i0.wp.com/s3.ap-southeast-1.amazonaws.com/techover.storage/wp-content/uploads/2023/01/02215334/Bie%CC%82%CC%89u-do%CC%82%CC%80-kho%CC%82ng-co%CC%81-tie%CC%82u-de%CC%82%CC%80.drawio-4.png?resize=764%2C358&ssl=1)
 #### 1.2. JWT Token <a name="jwt"></a>
-![JWT Token Usecase](https://www.vaadata.com/blog/wp-content/uploads/2016/12/JWT_tokens_EN.png)
+With Authenticate, when the user sends their email and password to the server, we use the AuthenticationManager class of Spring Security to confirm the information. Finally, we send a response with a token that is encoded using the UsernamePasswordAuthenticationToken method in the UsernamePasswordAuthenticationToken class provided by Spring Security.
+Below is JWT Flow Diagram
+![JWT Flow Diagram](https://github.com/K0l4s/blankcilapi/assets/87256083/a4ff5309-d512-49ca-b9ef-864a73ae327d)
+
 #### 1.3. Email Vertify <a name="emailauth"></a>
 We use email to verify users when they complete the registration process. The server will send an email notification to verify the user. This email will include a 6-digit PIN.
 

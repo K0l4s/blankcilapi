@@ -1,4 +1,4 @@
-package com.blankcil.api.blankcilapi.model;
+package com.blankcil.api.blankcilapi.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterResponse {
-    private String fullname;
-    private String email;
+public class AuthenticationRequest {
+
+  private String email;
+  String password;
 }

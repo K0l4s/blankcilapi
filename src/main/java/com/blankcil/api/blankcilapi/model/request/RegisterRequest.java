@@ -1,4 +1,4 @@
-package com.blankcil.api.blankcilapi.model;
+package com.blankcil.api.blankcilapi.model.request;
 
 import com.blankcil.api.blankcilapi.user.Role;
 import lombok.AllArgsConstructor;
@@ -15,10 +15,11 @@ import java.time.LocalDate;
 public class RegisterRequest {
   private String fullname;
   private String email;
+  private String nickName;
   private String password;
-  private Role role;
+//  private Role role;
   private LocalDate birthday;
   private String address;
   private String phone;
-  private String code;
+//  private String code;
 }

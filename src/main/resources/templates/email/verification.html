@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TakeNotes Verification</title>
+    <style type="text/css">
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eaf7ee;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        .body-container {
+            width: 100%;
+            height: 100%;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .content {
+            width: 90%;
+            max-width: 500px;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            margin: 0 auto;
+        }
+        .header {
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+        .verify-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 20px 0 0 18%;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .verify-button:hover {
+            background-color: #40b766;
+        }
+        .verification-code {
+            font-size: 18px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<table class="body-container" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center">
+            <table class="content" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td align="center">
+                        <img class="logo" src="https://firebasestorage.googleapis.com/v0/b/blankcil.appspot.com/o/logo192.png?alt=media&token=272996b3-e43d-466c-b6c1-eafd44adca5a" alt="TakeNotes" style="width: 200px; height: auto;">
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <p class="header" style="font-size: 26px; margin-bottom: 20px;">Thanks for choosing our service!!</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <p>Please use the code or click the button below to verify your registration:</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <p class="verification-code" th:text="${verificationCode}">N/A</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <a class="verify-button" th:href="${verificationUrl}" style="background-color: #4CAF50; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 20px 0; cursor: pointer; border-radius: 5px;">Verify your account</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <p>Blankcil Team</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

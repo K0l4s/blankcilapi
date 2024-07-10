@@ -13,7 +13,8 @@ import java.util.List;
 public interface IUserService {
     void changePassword(ChangePasswordRequest request, Principal connectedUser);
     UserModel getProfile();
-    UserModel getProfileOther(int id);
+    UserModel getProfileOtherByNickname(String nickname);
+
     UserModel updateUser(UserModel userModel, MultipartFile avatarImage, MultipartFile coverImage) throws IOException;
     SearchModel findByKeywords(String keyword);
     String likePodcast(int podcastId);

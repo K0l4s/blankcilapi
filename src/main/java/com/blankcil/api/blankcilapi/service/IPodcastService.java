@@ -1,7 +1,6 @@
 package com.blankcil.api.blankcilapi.service;
 
-import com.blankcil.api.blankcilapi.model.CommentModel;
-import com.blankcil.api.blankcilapi.model.PageResponse;
+import com.blankcil.api.blankcilapi.model.response.PageResponse;
 import com.blankcil.api.blankcilapi.model.PodcastModel;
 import org.springframework.web.multipart.MultipartFile;
 

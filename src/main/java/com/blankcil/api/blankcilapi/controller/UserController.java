@@ -1,9 +1,10 @@
 package com.blankcil.api.blankcilapi.controller;
 
 import com.blankcil.api.blankcilapi.model.CommentModel;
-import com.blankcil.api.blankcilapi.model.ResponseModel;
+import com.blankcil.api.blankcilapi.model.response.ResponseModel;
 import com.blankcil.api.blankcilapi.model.SearchModel;
 import com.blankcil.api.blankcilapi.model.UserModel;
+import com.blankcil.api.blankcilapi.service.FollowService;
 import com.blankcil.api.blankcilapi.service.IUserService;
 import com.blankcil.api.blankcilapi.user.ChangePasswordRequest;
 import com.blankcil.api.blankcilapi.service.UserServiceImpl;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -24,6 +24,8 @@ public class UserController {
 
     @Autowired
     IUserService userService = new UserServiceImpl();
+    @Autowired
+    private FollowService followService;
 
     @PatchMapping
     public ResponseEntity<?> changePassword(
@@ -46,10 +48,22 @@ public class UserController {
         }
     }
 
-    @GetMapping("/profile/{id}")
-    public ResponseEntity<ResponseModel> getProfileOther(@PathVariable int id) {
+//    @GetMapping("/profile/{id}")
+//    public ResponseEntity<ResponseModel> getProfileOther(@PathVariable int id) {
+//        try {
+//            UserModel userModel = userService.getProfileOther(id);
+//            return ResponseEntity.ok().body(new ResponseModel(true, "Get profile successfully", userModel));
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to get profile", null));
+//        }
+//    }
+
+    @GetMapping("/profile/{nickname}")
+    public ResponseEntity<ResponseModel> getProfileOther(@PathVariable String nickname) {
         try {
-            UserModel userModel = userService.getProfileOther(id);
+            UserModel userModel = userService.getProfileOtherByNickname(nickname);
             return ResponseEntity.ok().body(new ResponseModel(true, "Get profile successfully", userModel));
         }
         catch (Exception e) {
@@ -57,7 +71,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Failed to get profile", null));
         }
     }
-
 
 
     @PutMapping("/profile/edit")
@@ -100,7 +113,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
         }
     }
-
+    @PostMapping("/follow/{id}")
+    public ResponseEntity<ResponseModel> followUser(@PathVariable("id")int id){
+        try{
+            String msg = followService.follow(id);
+            return ResponseEntity.ok().body(new ResponseModel(true,msg,null));
+        }catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
+        }
+    }
     @PostMapping("/comment/podcast")
     public ResponseEntity<ResponseModel> commentOnPodcast(@RequestParam("content") String content,
                                                           @RequestParam("podcastId") int podcastId) {
@@ -134,4 +156,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseModel(false, "Error", null));
         }
     }
+
 }

@@ -24,6 +24,8 @@ public class PodcastEntity {
     private String audio_url;
     private String content;
     private LocalDateTime createDay;
+    private boolean isLock; //Xem xét khóa Podcast
+    private boolean isDelete; //Soft delete
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

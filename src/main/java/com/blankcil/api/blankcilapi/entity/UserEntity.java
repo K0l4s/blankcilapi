@@ -36,7 +36,8 @@ public class UserEntity implements UserDetails {
   private String code;
   private LocalDateTime createDay;
   private boolean isActive;
-
+  private boolean isLock = false; //Xem xét tài khoản khóa
+  private String nickName;
 
   @Enumerated(EnumType.STRING)
   private Role role;
@@ -55,6 +56,11 @@ public class UserEntity implements UserDetails {
 
   @OneToMany(mappedBy = "user_podcast_like")
   public List<PodcastLikeEntity> podcast_likes;
+
+  public UserEntity(String email, String fullname) {
+    this.email = email;
+    this.fullname = fullname;
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -88,6 +94,7 @@ public class UserEntity implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return !isLock;
   }
+
 }
