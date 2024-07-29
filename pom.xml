@@ -15,7 +15,7 @@
     <name>blankcilapi</name>
     <description>Podcast Social Media Page</description>
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <spring.version>5.1.2.RELEASE</spring.version>
     </properties>
     <dependencies>
@@ -71,6 +71,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
             <optional>true</optional>
         </dependency>
         <dependency>
