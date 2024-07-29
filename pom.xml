@@ -5,18 +5,17 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.2.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.blankcil.api</groupId>
     <artifactId>blankcilapi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>blankcilapi</name>
     <description>Podcast Social Media Page</description>
     <properties>
-        <java.version>21</java.version>
-        <spring.version>5.1.2.RELEASE</spring.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <!--		<dependency>-->
@@ -143,7 +142,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
         </dependency>
         <!--		Websocket-->
         <dependency>
